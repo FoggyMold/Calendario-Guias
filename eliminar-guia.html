@@ -24,21 +24,32 @@
     </div>
   </div>
 
-  <!-- Formulario para eliminar guía -->
-  <div class="container">
+ <div class="container mt-4">
     <header>
       <h1>Eliminar Guía</h1>
     </header>
 
     <form id="form-eliminar-guia">
       <div class="form-group">
-        <label for="id-guia">ID del Guía a eliminar:</label>
-        <input type="text" id="id-guia" name="id-guia" required />
+        <label for="select-guia">Selecciona el guía a eliminar</label>
+        <select id="select-guia" class="form-control" required>
+          <option value="" disabled selected>-- Selecciona un guía --</option>
+        </select>
       </div>
 
-      <button type="submit" class="btn">Eliminar</button>
+      <div id="datos-guia" style="display: none;">
+        <p><strong>Nombre:</strong> <span id="nombre-guia"></span></p>
+        <p><strong>Correo:</strong> <span id="correo-guia"></span></p>
+        <p><strong>Color:</strong> <span id="color-guia"></span></p>
+
+        <button type="submit" class="btn btn-danger">Eliminar Guía</button>
+      </div>
     </form>
+
+    <div id="mensaje" class="mt-3"></div>
   </div>
+
+  <script type="module" src="js/eliminar-guia.js"></script>
 
     <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
