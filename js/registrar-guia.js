@@ -1,4 +1,4 @@
-script type="module"
+
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
   import { getAnalytics, ref, push, set } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-analytics.js";
@@ -21,7 +21,6 @@ script type="module"
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
-script
 
 // Manejar envío del formulario
 document.getElementById('form-guia').addEventListener('submit', function (e) {
