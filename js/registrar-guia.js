@@ -1,12 +1,9 @@
-// Importar módulos de Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
 import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
 
-// Configuración
 const firebaseConfig = {
   apiKey: "AIzaSyBBaMEMyM25ng6s7JINFM_XH6Sx2AsRoiU",
   authDomain: "mifirebase-729f6.firebaseapp.com",
-  databaseURL: "https://mifirebase-729f6-default-rtdb.firebaseio.com/",
   projectId: "mifirebase-729f6",
   storageBucket: "mifirebase-729f6.firebasestorage.app",
   messagingSenderId: "191927410814",
@@ -14,60 +11,35 @@ const firebaseConfig = {
   measurementId: "G-C2PL3F1TQ5"
 };
 
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Escuchar envío del formulario
-document.getElementById('form-guia').addEventListener('submit', function (e) {
-  e.preventDefault();
+const form = document.getElementById("form-registro");
+const mensajeDiv = document.getElementById("mensaje");
 
-  const nombre = document.getElementById('nombre').value;
-  const correo = document.getElementById('correo').value;
-  const color = document.getElementById('color').value;
+form.addEventListener("submit", async (event) => {
+  event.preventDefault(); // ✅ Previene el envío por defecto
 
-  const guiaRef = ref(db, 'guias');
-  const nuevaGuiaRef = push(guiaRef);
+  const nombre = document.getElementById("nombre").value.trim();
+  const correo = document.getElementById("correo").value.trim();
+  const color = document.getElementById("color").value.trim();
 
-  set(nuevaGuiaRef, {
-    nombre,
-    correo,
-    color
-  })
-    .then(() => {
-      alert("Guía registrada correctamente");
-      document.getElementById('form-guia').reset();
-    })
-    .catch((error) => {
-      console.error("Error al registrar guía:", error);
-      alert("Error al registrar guía");
+  if (!nombre || !correo || !color) {
+    mensajeDiv.innerHTML = `<div class="alert alert-warning">Por favor completa todos los campos.</div>`;
+    return;
+  }
+
+  try {
+    const nuevoGuiaRef = push(ref(db, "guias")); // ✅ Solo una vez
+    await set(nuevoGuiaRef, {
+      nombre,
+      correo,
+      color
     });
-});
 
-
-// Manejar envío del formulario
-document.getElementById('form-guia').addEventListener('submit', function (e) {
-  e.preventDefault();
-
-  const nombre = document.getElementById('nombre').value;
-  const correo = document.getElementById('correo').value;
-  const color = document.getElementById('color').value;
-
-  // Referencia al nodo "guias"
-  const guiasRef = ref(db, 'guias');
-  const nuevoGuiaRef = push(guiasRef);
-
-  set(nuevoGuiaRef, {
-    nombre,
-    correo,
-    color
-  })
-    .then(() => {
-      alert('Guía registrada exitosamente.');
-      document.getElementById('form-guia').reset();
-    })
-    .catch((error) => {
-      console.error("Error al registrar:", error);
-      alert('Hubo un error al registrar la guía.');
-    });
+    mensajeDiv.innerHTML = `<div class="alert alert-success">Guía registrado exitosamente.</div>`;
+    form.reset();
+  } catch (error) {
+    mensajeDiv.innerHTML = `<div class="alert alert-danger">Error al registrar: ${error.message}</div>`;
+  }
 });
