@@ -33,11 +33,14 @@ onValue(guiasRef, (snapshot) => {
     const guia = childSnapshot.val();
 
     const fila = document.createElement("tr");
-    fila.innerHTML = `
+    // ejemplo para insertar la fila (dentro de tu código):
+    tbody.innerHTML += `
+    <tr>
       <td>${id}</td>
       <td>${guia.nombre}</td>
       <td>${guia.correo}</td>
-      <td><div style="width: 30px; height: 30px; background: ${guia.color}; border-radius: 50%; margin: auto;"></div></td>
+      <td class="color-box" style="background-color: ${guia.color};"></td>
+    </tr>
     `;
 
     tbody.appendChild(fila);
