@@ -114,3 +114,49 @@ input[type="color"] {
   border-radius: 8px;
   font-size: 1rem;
 }
+
+/* Centrar y estilizar el título */
+h1 {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: #333;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Tabla con sombra y bordes redondeados */
+table#tabla-guias {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  overflow: hidden; /* para que el border-radius funcione */
+}
+
+/* Celdas de la tabla */
+table#tabla-guias th, table#tabla-guias td {
+  vertical-align: middle !important;
+}
+
+/* Color personalizado para el header */
+table#tabla-guias thead {
+  background-color: #f9a72d;
+  color: white;
+  font-weight: 600;
+}
+
+/* Color para filas pares */
+table#tabla-guias tbody tr:nth-child(even) {
+  background-color: #fff7e6;
+}
+
+/* Efecto hover para filas */
+table#tabla-guias tbody tr:hover {
+  background-color: #ffe599;
+  cursor: pointer;
+}
+
+/* Columna de color con cuadro visual */
+td.color-box {
+  width: 50px;
+  height: 30px;
+  border-radius: 5px;
+}
