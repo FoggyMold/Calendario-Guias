@@ -1,0 +1,48 @@
+body{
+	/* color de fondo*/
+	background-color: ;
+	/*color de texto*/
+	/*Tamaño de fuente*/
+	font-size: 24px;
+	/*Alinear el Texto*/
+	text-align: justify;
+	margin: 10px;
+	padding: 30px;
+}
+
+h1{
+	color: white;
+	text-align: left;
+	margin-bottom: 20px;
+}
+
+h3{
+	color: #cc333f;
+}
+
+h4{
+	color: white;
+}
+
+
+.espacio{
+	margin-top: 30px;
+	margin-bottom: 80px;/*Añade un margen inferior de 20px*/
+}
+
+.card-text{
+	color: #626970;
+}
+
+.card-body{
+	background-color: #edc951;
+}
+
+.card-link{
+	color: #11091a;
+	font-size: 16px;
+}
+
+.list-group-item{
+	color: #11091a;
+}
