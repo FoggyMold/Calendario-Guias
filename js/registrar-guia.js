@@ -14,7 +14,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const form = document.getElementById("form-registro");
+const form = document.getElementById("form-guia");
 const mensajeDiv = document.getElementById("mensaje");
 
 form.addEventListener("submit", async (event) => {
