@@ -13,7 +13,7 @@
   </head>
   <body>
 
-    <!-- Barra superior con logo centrado -->
+    <!-- Barra superior con logo -->
     <div class="container-barra">
       <div class="row">
         <div class="col-md-4"></div>
@@ -24,32 +24,42 @@
       </div>
     </div>
 
-    <!-- Contenedor del formulario -->
+    <!-- Contenido -->
     <div class="container">
       <header>
-        <h1>Horario de Guía</h1>
+        <h1>Horarios de Guías</h1>
       </header>
 
-      <form id="form-horario-guia">
-        <div class="form-group">
-          <label for="guia-select">Selecciona un guía</label>
-          <select id="guia-select" class="form-control" required>
-            <option value="">Cargando guías...</option>
-          </select>
-        </div>
+      <!-- Filtro de guía -->
+      <div class="form-group filtro">
+        <label for="filtro-guia"><strong>Filtrar por guía:</strong></label>
+        <select id="filtro-guia" class="form-control">
+          <option value="">Todos</option>
+        </select>
+      </div>
 
-        <div class="form-group">
-          <label for="disponible">
-            <input type="checkbox" id="disponible" />
-            Disponible de 09:00 a 20:00
-          </label>
-        </div>
+      <!-- Tabla de horarios -->
+      <div class="table-responsive">
+        <table id="tabla-horarios">
+          <thead>
+            <tr>
+              <th>Guía</th>
+              <th>Lunes</th>
+              <th>Martes</th>
+              <th>Miércoles</th>
+              <th>Jueves</th>
+              <th>Viernes</th>
+              <th>Sábado</th>
+              <th>Domingo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Datos dinámicos -->
+          </tbody>
+        </table>
+      </div>
 
-        <button type="submit" class="btn">Guardar Horario</button>
-        <a href="index.html" class="btn">← Regresar</a>
-      </form>
-
-      <div id="mensaje" style="margin-top: 1rem;"></div>
+      <a href="index.html" class="btn btn-back">← Regresar al menú</a>
     </div>
 
     <!-- Lógica -->
