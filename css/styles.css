@@ -160,3 +160,38 @@ td.color-box {
   height: 30px;
   border-radius: 5px;
 }
+
+table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+      }
+
+      th, td {
+        padding: 0.75rem;
+        text-align: center;
+        border: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f9a72d;
+        color: white;
+      }
+
+      .filtro {
+        margin: 1rem auto;
+        width: 100%;
+        max-width: 500px;
+        text-align: left;
+      }
+
+      .btn-back {
+        margin-top: 2rem;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+      }
