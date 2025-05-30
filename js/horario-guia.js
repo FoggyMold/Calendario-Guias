@@ -1,6 +1,7 @@
-// Importar módulos de Firebase
+// js/horario-guias.js
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
-import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
+import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -18,60 +19,58 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Elementos del DOM
-const selectGuia = document.getElementById('guia-select');
-const checkbox = document.getElementById('disponible');
-const form = document.getElementById('form-horario-guia');
-const mensaje = document.getElementById('mensaje');
+const tablaBody = document.querySelector('#tabla-horarios tbody');
+const filtroSelect = document.getElementById('filtro-guia');
 
-// Cargar guías desde Firebase
-function cargarGuias() {
+// Cargar datos
+async function cargarDatos() {
   const dbRef = ref(db);
-  get(child(dbRef, 'guias')).then(snapshot => {
-    if (snapshot.exists()) {
-      selectGuia.innerHTML = '<option value="">Selecciona un guía</option>';
-      const guias = snapshot.val();
-      for (let id in guias) {
-        const guia = guias[id];
-        const option = document.createElement('option');
-        option.value = id;
-        option.textContent = guia.nombre;
-        selectGuia.appendChild(option);
-      }
-    } else {
-      selectGuia.innerHTML = '<option value="">No hay guías registrados</option>';
-    }
-  }).catch(error => {
-    console.error("Error al cargar guías:", error);
+  const snapshotGuias = await get(child(dbRef, 'guias'));
+  const snapshotDisponibilidad = await get(child(dbRef, 'disponibilidad'));
+
+  if (!snapshotGuias.exists()) return;
+
+  const guias = snapshotGuias.val();
+  const disponibilidad = snapshotDisponibilidad.exists() ? snapshotDisponibilidad.val() : {};
+
+  tablaBody.innerHTML = '';
+  filtroSelect.innerHTML = '<option value="">Todos</option>';
+
+  Object.entries(guias).forEach(([id, guia]) => {
+    const dias = ['lunes','martes','miércoles','jueves','viernes','sábado','domingo'];
+    const fila = document.createElement('tr');
+    fila.setAttribute('data-id', id);
+
+    // Columna del nombre
+    const tdNombre = document.createElement('td');
+    tdNombre.textContent = guia.nombre;
+    fila.appendChild(tdNombre);
+
+    dias.forEach(dia => {
+      const td = document.createElement('td');
+      const disponible = disponibilidad[id]?.[dia] === true;
+      td.textContent = disponible ? '✅' : '❌';
+      fila.appendChild(td);
+    });
+
+    tablaBody.appendChild(fila);
+
+    // Agregar al filtro
+    const option = document.createElement('option');
+    option.value = id;
+    option.textContent = guia.nombre;
+    filtroSelect.appendChild(option);
   });
 }
 
-// Guardar disponibilidad
-form.addEventListener('submit', function (e) {
-  e.preventDefault();
-
-  const guiaID = selectGuia.value;
-  const disponible = checkbox.checked;
-
-  if (!guiaID) {
-    alert("Por favor selecciona un guía.");
-    return;
-  }
-
-  const disponibilidadRef = ref(db, 'disponibilidad/' + guiaID);
-  const datos = disponible
-    ? { disponible: true, inicio: "09:00", fin: "20:00" }
-    : { disponible: false };
-
-  set(disponibilidadRef, datos)
-    .then(() => {
-      mensaje.innerHTML = `<div class="alert alert-success">Horario guardado correctamente.</div>`;
-    })
-    .catch((error) => {
-      console.error("Error al guardar horario:", error);
-      mensaje.innerHTML = `<div class="alert alert-danger">Ocurrió un error al guardar.</div>`;
-    });
+// Filtro por guía
+filtroSelect.addEventListener('change', () => {
+  const filtro = filtroSelect.value;
+  document.querySelectorAll('#tabla-horarios tbody tr').forEach(tr => {
+    const mostrar = !filtro || tr.getAttribute('data-id') === filtro;
+    tr.style.display = mostrar ? '' : 'none';
+  });
 });
 
-// Inicializar
-cargarGuias();
+// Ejecutar carga
+cargarDatos();
