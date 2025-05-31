@@ -14,24 +14,19 @@
   <body>
 
     <div class="container">
-    <h1>Modificar horario de guías</h1>
+    <h1>Horario de Guías</h1>
 
-     <div class="selector-fecha">
-      <label for="fecha">Selecciona una fecha:</label>
+    <div class="selector">
       <input type="date" id="fecha" />
+      <div>
+        <button id="btn-dia" class="btn-toggle active">Ver por día</button>
+        <button id="btn-semana" class="btn-toggle">Ver por semana</button>
+      </div>
     </div>
 
-    <div id="semana" class="semana">
-      <!-- Aquí se mostrará la semana completa -->
+    <div id="contenido">
+      <!-- Aquí se muestra la tabla dinámica -->
     </div>
-
-    <div id="tabla-guias" class="tabla-guias">
-      <!-- Aquí se mostrará la tabla con los guías disponibles -->
-    </div>
-  </div>
-
-    <button id="guardar-cambios" class="btn">Guardar cambios</button>
-    <a href="index.html" class="btn-back">Regresar</a>
   </div>
 
     <!-- Lógica -->
