@@ -47,7 +47,7 @@
           return;
         }
 
-        const scriptUrl = "TU_URL_DEL_APPS_SCRIPT"; // ⬅️ Pega aquí tu URL del Apps Script desplegado
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbwA5QHh8hARpglpVPgLk8hqTwJpgItAi_nkerwefyRVmSeKk2I0qD5SQy4G6Z8U46Fs/exec"; // ⬅️ Pega aquí tu URL del Apps Script desplegado
 
         fetch(`${scriptUrl}?fecha=${fecha}`)
           .then(res => res.text())
