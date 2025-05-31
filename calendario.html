@@ -6,171 +6,35 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/calendar.css" />
 
     <title>Calendario de Guías</title>
 
-    <style>
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 20px;
-        background-color: white;
-        border-bottom: 1px solid #ccc;
-        flex-shrink: 0;
-      }
-
-      .logo {
-        max-height: 60px;
-        height: auto;
-      }
-
-      .controls {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }
-
-      .calendar-container {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-
-      .timeline {
-        display: flex;
-        overflow-x: auto;
-        background-color: #f0f0f0;
-        border-bottom: 1px solid #ccc;
-        padding: 10px 0;
-        flex-shrink: 0;
-      }
-
-      .time-slot {
-        flex: 0 0 100px;
-        text-align: center;
-        font-size: 13px;
-        border-right: 1px solid #ddd;
-        color: #444;
-      }
-
-      .event-space {
-        flex: 1;
-        overflow: auto;
-        background-color: #fafafa;
-      }
-
-      /* Responsive tweaks */
-      @media (max-width: 768px) {
-        .header {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 10px;
-        }
-        .controls {
-          width: 100%;
-          justify-content: flex-end;
-        }
-        .event-block {
-          font-size: 12px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-      }
-    </style>
   </head>
   <body>
 
-    <!-- Barra superior -->
-    <div class="header">
-      <img src="images/logo2.jpg" alt="Logo" class="logo" />
-      <div class="controls">
-        <input type="date" class="form-control" />
-        <button class="btn btn-primary">Guardar</button>
-      </div>
+    <div class="top-bar">
+    <div class="controls">
+      <input type="date" id="fechaBase" />
+      <button class="btn" id="vista-dia">1 Día</button>
+      <button class="btn" id="vista-tres">3 Días</button>
+      <button class="btn" id="zoom-in">🔍 Acercar</button>
+      <button class="btn" id="zoom-out">🔎 Alejar</button>
+    </div>
+    <a href="index.html" class="btn">← Regresar</a>
+  </div>
+
+  <div class="calendar-container">
+    <div class="sidebar" id="listaGuias">
+      <!-- Guías se llenarán dinámicamente -->
     </div>
 
-    <!-- Calendario -->
-    <div class="calendar-container">
-      <!-- Línea de tiempo -->
-      <div class="timeline" id="timeline">
-        <!-- Slots generados dinámicamente -->
-      </div>
-
-      <!-- Área de eventos -->
-      <div class="event-space" id="event-space">
-        <!-- Aquí se agregarán los eventos -->
-      </div>
+    <div class="main-calendar" id="ganttCalendar">
+      <!-- Gantt dinámico aquí -->
     </div>
+  </div>
 
-    <!-- Scripts -->
-    <script>
-      const timeline = document.getElementById("timeline");
-      const startHour = 9;
-      const endHour = 19;
-
-      for (let i = startHour; i < endHour; i++) {
-        const hour = String(i).padStart(2, '0') + ":00";
-        const slot = document.createElement("div");
-        slot.className = "time-slot";
-        slot.textContent = hour;
-        timeline.appendChild(slot);
-      }
-      const WEBAPP_URL = "https://script.google.com/a/macros/chillandgotours.com/s/AKfycbx7I8a5l34AP2aqhZ769UiNMszacStE690AycBOm4oQ4Y6NgkQsz6gJnP1r9sZObL5z/exec";
-
-  const dateInput = document.querySelector('input[type="date"]');
-  const eventSpace = document.getElementById("event-space");
-
-  dateInput.addEventListener("change", async () => {
-    const selectedDate = dateInput.value;
-    if (!selectedDate) return;
-
-    eventSpace.innerHTML = ""; // Limpiar eventos anteriores
-
-    try {
-      const res = await fetch(`${WEBAPP_URL}?date=${selectedDate}`);
-      const events = await res.json();
-
-      events.forEach(event => {
-        const start = new Date(event.start);
-        const end = new Date(event.end);
-        const hour = start.getHours();
-        const minutes = start.getMinutes();
-
-        const block = document.createElement("div");
-        block.className = "event-block";
-        block.textContent = `${event.title} (${start.getHours()}:${String(start.getMinutes()).padStart(2, '0')})`;
-        block.style.position = "absolute";
-        block.style.top = `${(hour - 9) * 60 + minutes}px`; // posición vertical aprox
-        block.style.left = "10px";
-        block.style.width = "200px";
-        block.style.height = `${(end - start) / (1000 * 60)}px`; // duración en px
-        block.style.backgroundColor = "#4285F4";
-        block.style.color = "white";
-        block.style.padding = "5px";
-        block.style.borderRadius = "5px";
-
-        eventSpace.appendChild(block);
-      });
-    } catch (err) {
-      console.error("Error cargando eventos", err);
-    }
-  });
-    </script>
-
+    <script type="module" src="calendario.js"></script>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
