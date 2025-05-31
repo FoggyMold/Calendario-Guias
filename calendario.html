@@ -14,28 +14,56 @@
   <body>
 
     <div class="top-bar">
-    <div class="controls">
-      <input type="date" id="fechaBase" />
-      <button class="btn" id="vista-dia">1 Día</button>
-      <button class="btn" id="vista-tres">3 Días</button>
-      <button class="btn" id="zoom-in">🔍 Acercar</button>
-      <button class="btn" id="zoom-out">🔎 Alejar</button>
-    </div>
-    <a href="index.html" class="btn">← Regresar</a>
-  </div>
-
-  <div class="calendar-container">
-    <div class="sidebar" id="listaGuias">
-      <!-- Guías se llenarán dinámicamente -->
+      <div class="controls">
+        <input type="date" id="fechaBase" />
+        <button class="btn" id="vista-dia">1 Día</button>
+        <button class="btn" id="vista-tres">3 Días</button>
+        <button class="btn" id="zoom-in">🔍 Acercar</button>
+        <button class="btn" id="zoom-out">🔎 Alejar</button>
+        <button class="btn" onclick="sincronizarEventos()">🔄 Sincronizar eventos</button>
+      </div>
+      <a href="index.html" class="btn">← Regresar</a>
     </div>
 
-    <div class="main-calendar" id="ganttCalendar">
-      <!-- Gantt dinámico aquí -->
-    </div>
-  </div>
+    <div class="calendar-container">
+      <div class="sidebar" id="listaGuias">
+        <!-- Guías se llenarán dinámicamente -->
+      </div>
 
+      <div class="main-calendar" id="ganttCalendar">
+        <!-- Gantt dinámico aquí -->
+      </div>
+    </div>
+
+    <!-- JS del Gantt -->
     <script type="module" src="calendario.js"></script>
-    <!-- Bootstrap JS -->
+
+    <!-- Sincronización con Google Apps Script -->
+    <script>
+      function sincronizarEventos() {
+        const fecha = document.getElementById("fechaBase").value;
+        if (!fecha) {
+          alert("Selecciona una fecha para sincronizar");
+          return;
+        }
+
+        const scriptUrl = "TU_URL_DEL_APPS_SCRIPT"; // ⬅️ Pega aquí tu URL del Apps Script desplegado
+
+        fetch(`${scriptUrl}?fecha=${fecha}`)
+          .then(res => res.text())
+          .then(msg => {
+            alert("Eventos sincronizados desde Google Calendar");
+            console.log(msg);
+            // Opcional: recargar eventos para esa fecha
+            location.reload(); // o llamar a tu función de recarga de Gantt
+          })
+          .catch(err => {
+            console.error("Error al sincronizar:", err);
+            alert("Error al sincronizar los eventos");
+          });
+      }
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/bootstrap.min.js"></script>
