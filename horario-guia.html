@@ -13,54 +13,31 @@
   </head>
   <body>
 
-    <!-- Barra superior con logo -->
-    <div class="container-barra">
-      <div class="row">
-        <div class="col-md-4"></div>
-        <div class="col-md-4 center-logo">
-          <img src="images/logo2.jpg" alt="Logo" class="logo" />
-        </div>
-        <div class="col-md-4"></div>
-      </div>
-    </div>
-
-    <!-- Contenido -->
     <div class="container">
-      <header>
-        <h1>Horarios de Guías</h1>
-      </header>
+    <h1>Modificar horario de guías</h1>
 
-      <!-- Filtro de guía -->
-      <div class="form-group filtro">
-        <label for="filtro-guia"><strong>Filtrar por guía:</strong></label>
-        <select id="filtro-guia" class="form-control">
-          <option value="">Todos</option>
-        </select>
-      </div>
-
-      <!-- Tabla de horarios -->
-      <div class="table-responsive">
-        <table id="tabla-horarios">
-          <thead>
-            <tr>
-              <th>Guía</th>
-              <th>Lunes</th>
-              <th>Martes</th>
-              <th>Miércoles</th>
-              <th>Jueves</th>
-              <th>Viernes</th>
-              <th>Sábado</th>
-              <th>Domingo</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Datos dinámicos -->
-          </tbody>
-        </table>
-      </div>
-
-      <a href="index.html" class="btn btn-back">← Regresar al menú</a>
+    <div class="form-group">
+      <label for="fecha">Selecciona un día:</label>
+      <input type="date" id="fecha" required>
     </div>
+
+    <table id="tabla-guias">
+      <thead>
+        <tr>
+          <th>Guía</th>
+          <th>Disponible</th>
+          <th>Hora inicio</th>
+          <th>Hora fin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Aquí se llenan dinámicamente los guías -->
+      </tbody>
+    </table>
+
+    <button id="guardar-cambios" class="btn">Guardar cambios</button>
+    <a href="menu.html" class="btn-back">Regresar</a>
+  </div>
 
     <!-- Lógica -->
     <script type="module" src="js/horario-guia.js"></script>
