@@ -195,3 +195,38 @@ table {
         cursor: pointer;
         text-decoration: none;
       }
+.selector-fecha {
+  margin-bottom: 1rem;
+}
+
+.semana {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+.semana div {
+  background-color: #f9a72d;
+  color: white;
+  padding: 0.5rem;
+  text-align: center;
+  border-radius: 5px;
+  flex: 1;
+}
+
+.tabla-guias {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th, td {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  text-align: center;
+}
