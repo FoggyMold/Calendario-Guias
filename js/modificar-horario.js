@@ -1,6 +1,6 @@
 // Importar Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
-import { getDatabase, ref, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
 
 // Configuración Firebase
 const firebaseConfig = {
@@ -13,97 +13,101 @@ const firebaseConfig = {
   appId: "1:191927410814:web:085873d617037fe286382f"
 };
 
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 // Referencias DOM
-const tablaGuias = document.querySelector('#tabla-guias tbody');
 const fechaInput = document.getElementById('fecha');
-const btnGuardar = document.getElementById('guardar-cambios');
+const tablaGuias = document.querySelector('#tabla-guias tbody');
+const formHorarios = document.getElementById('form-horarios');
 
 let guias = {};
 
-// Cargar guías
-function cargarGuias() {
-  const guiasRef = ref(db, 'guias');
-  onValue(guiasRef, (snapshot) => {
-    guias = snapshot.val() || {};
-    mostrarGuias();
-  });
+// Cargar guías desde Firebase
+async function cargarGuias() {
+  const snapshot = await get(ref(db, 'guias'));
+  if (snapshot.exists()) {
+    guias = snapshot.val();
+    if (fechaInput.value) {
+      cargarHorarios(fechaInput.value);
+    }
+  }
 }
 
-// Mostrar tabla de guías
-function mostrarGuias() {
-  tablaGuias.innerHTML = '';
-  Object.entries(guias).forEach(([id, guia]) => {
-    const fila = document.createElement('tr');
+// Cargar horarios para la fecha seleccionada
+async function cargarHorarios(fecha) {
+  const snapshot = await get(ref(db, `horarios/${fecha}`));
+  const horarios = snapshot.exists() ? snapshot.val() : {};
 
-    fila.innerHTML = `
+  tablaGuias.innerHTML = '';
+
+  Object.entries(guias).forEach(([id, guia]) => {
+    const horario = horarios[id] || {
+      disponible: true,
+      horaInicio: '09:00',
+      horaFin: '20:00'
+    };
+
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
       <td>${guia.nombre}</td>
-      <td><input type="checkbox" class="disponible" data-id="${id}" checked></td>
-      <td><input type="time" class="hora-inicio horario-input" data-id="${id}" value="09:00"></td>
-      <td><input type="time" class="hora-fin horario-input" data-id="${id}" value="20:00"></td>
+      <td><input type="checkbox" class="disponible" data-id="${id}" ${horario.disponible ? 'checked' : ''}></td>
+      <td><input type="time" class="hora-inicio" data-id="${id}" value="${horario.horaInicio || '09:00'}" ${horario.disponible ? '' : 'disabled'}></td>
+      <td><input type="time" class="hora-fin" data-id="${id}" value="${horario.horaFin || '20:00'}" ${horario.disponible ? '' : 'disabled'}></td>
     `;
 
-    tablaGuias.appendChild(fila);
+    tablaGuias.appendChild(tr);
   });
 }
 
-// Cambiar habilitación de horarios al marcar o desmarcar disponibilidad
+// Habilitar/deshabilitar campos según checkbox
 tablaGuias.addEventListener('change', (e) => {
   if (e.target.classList.contains('disponible')) {
     const id = e.target.dataset.id;
+    const checked = e.target.checked;
+
     const inicio = document.querySelector(`.hora-inicio[data-id="${id}"]`);
     const fin = document.querySelector(`.hora-fin[data-id="${id}"]`);
-    const habilitado = e.target.checked;
-    inicio.disabled = !habilitado;
-    fin.disabled = !habilitado;
-    if (!habilitado) {
-      inicio.classList.add('disabled');
-      fin.classList.add('disabled');
-    } else {
-      inicio.classList.remove('disabled');
-      fin.classList.remove('disabled');
-    }
+
+    inicio.disabled = !checked;
+    fin.disabled = !checked;
   }
 });
 
-// Guardar cambios
-btnGuardar.addEventListener('click', async () => {
+// Guardar cambios al enviar el formulario
+formHorarios.addEventListener('submit', async (e) => {
+  e.preventDefault();
   const fecha = fechaInput.value;
-  if (!fecha) return alert('Selecciona una fecha');
-
-  const cambios = {};
-  const filas = tablaGuias.querySelectorAll('tr');
-
-  for (let fila of filas) {
-    const id = fila.querySelector('.disponible').dataset.id;
-    const disponible = fila.querySelector('.disponible').checked;
-
-    if (disponible) {
-      const horaInicio = fila.querySelector('.hora-inicio').value;
-      const horaFin = fila.querySelector('.hora-fin').value;
-
-      // Validación simple de horario
-      if (horaInicio >= horaFin) {
-        alert(`Error en los horarios de ${guias[id].nombre}`);
-        return;
-      }
-
-      cambios[id] = {
-        disponible: true,
-        horaInicio,
-        horaFin
-      };
-    } else {
-      cambios[id] = { disponible: false };
-    }
+  if (!fecha) {
+    alert('Selecciona una fecha');
+    return;
   }
 
-  const refDia = ref(db, `horarios/${fecha}`);
-  await set(refDia, cambios);
+  const datos = {};
+  Object.keys(guias).forEach(id => {
+    const disponible = document.querySelector(`.disponible[data-id="${id}"]`).checked;
+    const horaInicio = document.querySelector(`.hora-inicio[data-id="${id}"]`).value;
+    const horaFin = document.querySelector(`.hora-fin[data-id="${id}"]`).value;
 
+    datos[id] = {
+      disponible,
+      horaInicio: disponible ? horaInicio : null,
+      horaFin: disponible ? horaFin : null
+    };
+  });
+
+  await set(ref(db, `horarios/${fecha}`), datos);
   alert('Horarios guardados correctamente');
 });
 
+// Cargar cuando se cambia la fecha
+fechaInput.addEventListener('change', () => {
+  if (fechaInput.value) {
+    cargarHorarios(fechaInput.value);
+  }
+});
+
+// Iniciar
 cargarGuias();
