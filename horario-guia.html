@@ -16,24 +16,19 @@
     <div class="container">
     <h1>Modificar horario de guías</h1>
 
-    <div class="form-group">
-      <label for="fecha">Selecciona un día:</label>
-      <input type="date" id="fecha" required>
+     <div class="selector-fecha">
+      <label for="fecha">Selecciona una fecha:</label>
+      <input type="date" id="fecha" />
     </div>
 
-    <table id="tabla-guias">
-      <thead>
-        <tr>
-          <th>Guía</th>
-          <th>Disponible</th>
-          <th>Hora inicio</th>
-          <th>Hora fin</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Aquí se llenan dinámicamente los guías -->
-      </tbody>
-    </table>
+    <div id="semana" class="semana">
+      <!-- Aquí se mostrará la semana completa -->
+    </div>
+
+    <div id="tabla-guias" class="tabla-guias">
+      <!-- Aquí se mostrará la tabla con los guías disponibles -->
+    </div>
+  </div>
 
     <button id="guardar-cambios" class="btn">Guardar cambios</button>
     <a href="index.html" class="btn-back">Regresar</a>
