@@ -26,10 +26,10 @@ const zoomIn = document.getElementById("zoom-in");
 const zoomOut = document.getElementById("zoom-out");
 
 let diasVista = 1;
-let escalaHora = 60; // ancho base en px para una hora
-
+let escalaHora = 60;
 let guias = {};
 let eventos = {};
+let fechaSeleccionada = new Date();
 
 // -------- Utilidades --------
 function formatearFecha(date) {
@@ -76,7 +76,7 @@ function renderizarGuias() {
 
 function renderizarGantt(fechaInicio) {
   gantt.innerHTML = "";
-  const horasTotales = 12; // por defecto de 08:00 a 20:00
+  const horasTotales = 12;
   const horaInicial = 8;
 
   Object.entries(guias).forEach(([id, guia]) => {
@@ -114,7 +114,6 @@ function renderizarGantt(fechaInicio) {
       });
     }
 
-    // Actualizar resumen lateral
     const info = document.getElementById(`info-${id}`);
     if (info) info.textContent = `${eventosGuia} eventos / ${personasGuia} pers.`;
 
@@ -124,14 +123,31 @@ function renderizarGantt(fechaInicio) {
   gantt.style.width = `${diasVista * escalaHora * 12 + 100}px`;
 }
 
-// -------- Controladores --------
+// -------- Actualizar Vista --------
 async function actualizarVista() {
-  if (!fechaBase.value) return;
-  const fecha = new Date(fechaBase.value);
-  await cargarEventos(fecha, diasVista);
+  await cargarEventos(fechaSeleccionada, diasVista);
   renderizarGuias();
-  renderizarGantt(fecha);
+  renderizarGantt(fechaSeleccionada);
 }
+
+// -------- Sincronizar con Apps Script --------
+window.sincronizarEventos = async function () {
+  const fecha = fechaBase.value;
+  if (!fecha) return alert("Selecciona una fecha");
+
+  const scriptUrl = "TU_URL_DEL_APPS_SCRIPT"; // ⚠️ Reemplaza con tu URL real
+
+  try {
+    const res = await fetch(`${scriptUrl}?fecha=${fecha}`);
+    const texto = await res.text();
+    console.log("Respuesta Apps Script:", texto);
+    await actualizarVista(); // Recarga sin refrescar página
+    alert("Eventos sincronizados y actualizados en la vista");
+  } catch (err) {
+    console.error("Error al sincronizar:", err);
+    alert("Error al sincronizar eventos");
+  }
+};
 
 // -------- Eventos UI --------
 btnDia.addEventListener("click", () => {
@@ -154,12 +170,16 @@ zoomOut.addEventListener("click", () => {
   actualizarVista();
 });
 
-fechaBase.addEventListener("change", actualizarVista);
+fechaBase.addEventListener("change", async () => {
+  fechaSeleccionada = new Date(fechaBase.value);
+  await actualizarVista();
+});
 
-// Inicializar
+// -------- Inicializar --------
 (async () => {
   await cargarGuias();
   const hoy = new Date();
   fechaBase.value = formatearFecha(hoy);
+  fechaSeleccionada = hoy;
   await actualizarVista();
 })();
