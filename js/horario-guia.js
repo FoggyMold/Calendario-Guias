@@ -2,13 +2,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
 import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
 
-// Configuración Firebase (misma que en registrar-guia.js)
+// Configuración Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBBaMEMyM25ng6s7JINFM_XH6Sx2AsRoiU",
   authDomain: "mifirebase-729f6.firebaseapp.com",
   databaseURL: "https://mifirebase-729f6-default-rtdb.firebaseio.com/",
   projectId: "mifirebase-729f6",
-  storageBucket: "mifirebase-729f6.firebasestorage.app",
+  storageBucket: "mifirebase-729f6.appspot.com",
   messagingSenderId: "191927410814",
   appId: "1:191927410814:web:085873d617037fe286382f"
 };
@@ -17,9 +17,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// Referencias DOM
 const fechaInput = document.getElementById('fecha');
-const semanaDiv = document.getElementById('semana');
-const tablaDiv = document.getElementById('tabla-guias');
+const btnDia = document.getElementById('btn-dia');
+const btnSemana = document.getElementById('btn-semana');
+const contenido = document.getElementById('contenido');
+
+let vista = "dia"; // o "semana"
+
+// --------- Funciones ---------
 
 // Obtener el lunes de la semana de una fecha
 function obtenerSemanaCompleta(fechaStr) {
@@ -37,58 +43,124 @@ function obtenerSemanaCompleta(fechaStr) {
   return dias;
 }
 
-// Formatear fecha a yyyy-mm-dd
+// Formato yyyy-mm-dd
 function formatearFecha(date) {
   return date.toISOString().split("T")[0];
 }
 
-// Mostrar encabezado de semana
-function mostrarSemana(fechas) {
-  semanaDiv.innerHTML = "";
-  fechas.forEach(f => {
-    const div = document.createElement('div');
-    div.textContent = f.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'short' });
-    semanaDiv.appendChild(div);
-  });
+// Formato "martes 28 may"
+function formatearFechaCorta(date) {
+  return date.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
-// Mostrar guías disponibles para una fecha específica
-async function mostrarGuiasDisponibles(fechaSeleccionada) {
+// Mostrar tabla por día
+async function mostrarVistaDia(fechaStr) {
   const guiasSnap = await get(ref(db, 'guias'));
-  const horariosSnap = await get(ref(db, `horarios/${fechaSeleccionada}`));
+  const horariosSnap = await get(ref(db, `horarios/${fechaStr}`));
 
   const guias = guiasSnap.exists() ? guiasSnap.val() : {};
   const horarios = horariosSnap.exists() ? horariosSnap.val() : {};
 
-  let html = '<table><thead><tr><th>Guía</th><th>Disponible</th><th>Inicio</th><th>Fin</th></tr></thead><tbody>';
+  let html = `<h2>Horario para el ${new Date(fechaStr).toLocaleDateString()}</h2>`;
+  html += `
+    <table>
+      <thead>
+        <tr>
+          <th>Guía</th>
+          <th>Disponible</th>
+          <th>Horario</th>
+          <th>Eventos</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
 
   Object.entries(guias).forEach(([id, guia]) => {
-    const disponible = horarios[id]?.disponible ?? true;
-    const inicio = horarios[id]?.horaInicio ?? "09:00";
-    const fin = horarios[id]?.horaFin ?? "20:00";
+    const h = horarios[id] || {};
+    const disponible = h.disponible ?? true;
+    const horaInicio = h.horaInicio ?? "09:00";
+    const horaFin = h.horaFin ?? "20:00";
+    const eventos = h.eventosAsignados ?? 0;
 
-    if (disponible && inicio === "09:00" && fin === "20:00") {
-      html += `
-        <tr>
-          <td>${guia.nombre}</td>
-          <td>✅</td>
-          <td>${inicio}</td>
-          <td>${fin}</td>
-        </tr>
-      `;
-    }
+    html += `
+      <tr>
+        <td>${guia.nombre}</td>
+        <td>${disponible ? "✅" : "❌"}</td>
+        <td>${disponible ? `${horaInicio} - ${horaFin}` : "-"}</td>
+        <td>${eventos} / 3</td>
+      </tr>
+    `;
   });
 
   html += '</tbody></table>';
-  tablaDiv.innerHTML = html;
+  contenido.innerHTML = html;
 }
 
-// Evento cuando se selecciona una fecha
-fechaInput.addEventListener('change', () => {
-  const fecha = fechaInput.value;
-  if (!fecha) return;
+// Mostrar tabla por semana
+async function mostrarVistaSemana(fechaStr) {
+  const fechasSemana = obtenerSemanaCompleta(fechaStr);
+  const guiasSnap = await get(ref(db, 'guias'));
+  const guias = guiasSnap.exists() ? guiasSnap.val() : {};
 
-  const semana = obtenerSemanaCompleta(fecha);
-  mostrarSemana(semana);
-  mostrarGuiasDisponibles(fecha);
+  // Obtener horarios por cada día
+  const horariosPorDia = {};
+  for (let fecha of fechasSemana) {
+    const key = formatearFecha(fecha);
+    const snap = await get(ref(db, `horarios/${key}`));
+    horariosPorDia[key] = snap.exists() ? snap.val() : {};
+  }
+
+  let html = `<h2>Semana del ${formatearFechaCorta(fechasSemana[0])} al ${formatearFechaCorta(fechasSemana[6])}</h2>`;
+  html += `
+    <table>
+      <thead>
+        <tr>
+          <th>Guía</th>
+          ${fechasSemana.map(f => `<th>${formatearFechaCorta(f)}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  Object.entries(guias).forEach(([id, guia]) => {
+    html += `<tr><td>${guia.nombre}</td>`;
+    fechasSemana.forEach(f => {
+      const fechaKey = formatearFecha(f);
+      const h = horariosPorDia[fechaKey]?.[id] || {};
+      const disponible = h.disponible ?? true;
+      const eventos = h.eventosAsignados ?? 0;
+      const color = disponible ? "✅" : "❌";
+      html += `<td>${color}<br>${eventos} / 3</td>`;
+    });
+    html += `</tr>`;
+  });
+
+  html += '</tbody></table>';
+  contenido.innerHTML = html;
+}
+
+// Cambiar vista activa
+function cambiarVista(nuevaVista) {
+  vista = nuevaVista;
+  btnDia.classList.toggle("active", vista === "dia");
+  btnSemana.classList.toggle("active", vista === "semana");
+  if (fechaInput.value) {
+    vista === "dia"
+      ? mostrarVistaDia(fechaInput.value)
+      : mostrarVistaSemana(fechaInput.value);
+  }
+}
+
+// --------- Eventos ---------
+btnDia.addEventListener("click", () => cambiarVista("dia"));
+btnSemana.addEventListener("click", () => cambiarVista("semana"));
+
+fechaInput.addEventListener("change", () => {
+  if (!fechaInput.value) return;
+  vista === "dia"
+    ? mostrarVistaDia(fechaInput.value)
+    : mostrarVistaSemana(fechaInput.value);
 });
+
+// Inicial: mostrar por día si ya hay fecha seleccionada
+if (fechaInput.value) mostrarVistaDia(fechaInput.value);
