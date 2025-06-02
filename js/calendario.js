@@ -53,13 +53,13 @@ async function cargarEventos(fechaInicio, dias) {
   for (let i = 0; i < dias; i++) {
     const fechaStr = formatearFecha(sumarDias(fechaInicio, i));
     const snap = await get(ref(db, `eventos/${fechaStr}`));
-    if (snap.exists()){ 
+    if (snap.exists()) {
       eventos[fechaStr] = snap.val();
       console.log("Eventos cargados para", fechaStr, eventos[fechaStr]);
     } else {
-        console.log("No hay eventos para", fechaStr);
-      }
+      console.log("No hay eventos para", fechaStr);
     }
+  }
 }
 
 // -------- Renderizar --------
@@ -84,6 +84,46 @@ function renderizarGantt(fechaInicio) {
   const horasTotales = 12;
   const horaInicial = 8;
 
+  // Mostrar eventos sin guía
+  const sinGuiaRow = document.createElement("div");
+  sinGuiaRow.className = "gantt-row";
+  sinGuiaRow.style.background = "#f9f9f9";
+
+  for (let i = 0; i < diasVista; i++) {
+    const fecha = formatearFecha(sumarDias(fechaInicio, i));
+    const eventosDia = eventos[fecha] || {};
+
+    Object.entries(eventosDia).forEach(([eid, ev]) => {
+      if (!ev.guiaAsignado) {
+        const horaInicio = parseInt(ev.inicio.split(":")[0]);
+        const horaFin = parseInt(ev.fin.split(":")[0]);
+        const duracion = horaFin - horaInicio;
+        const left = ((i * horasTotales) + (horaInicio - horaInicial)) * escalaHora;
+        const width = duracion * escalaHora;
+
+        const block = document.createElement("div");
+        block.className = "event-block";
+        block.style.left = `${left}px`;
+        block.style.width = `${width}px`;
+        block.style.top = "10px";
+        block.style.background = "#cccccc";
+        block.style.cursor = "pointer";
+        block.textContent = `${ev.museo} (${ev.personas})`;
+        block.dataset.eventoId = eid;
+        block.dataset.fecha = fecha;
+
+        block.addEventListener("click", () => {
+          alert(`Evento sin asignar: ${ev.museo}, ${ev.personas} personas.`);
+        });
+
+        sinGuiaRow.appendChild(block);
+      }
+    });
+  }
+
+  gantt.appendChild(sinGuiaRow);
+
+  // Mostrar eventos asignados a cada guía
   Object.entries(guias).forEach(([id, guia]) => {
     const row = document.createElement("div");
     row.className = "gantt-row";
@@ -100,7 +140,6 @@ function renderizarGantt(fechaInicio) {
           const horaInicio = parseInt(ev.inicio.split(":")[0]);
           const horaFin = parseInt(ev.fin.split(":")[0]);
           const duracion = horaFin - horaInicio;
-
           const left = ((i * horasTotales) + (horaInicio - horaInicial)) * escalaHora;
           const width = duracion * escalaHora;
 
@@ -111,6 +150,8 @@ function renderizarGantt(fechaInicio) {
           block.style.top = "10px";
           block.style.background = guia.color || "#f9a72d";
           block.textContent = `${ev.museo} (${ev.personas})`;
+          block.dataset.eventoId = eid;
+          block.dataset.fecha = fecha;
 
           row.appendChild(block);
           eventosGuia++;
@@ -140,13 +181,13 @@ window.sincronizarEventos = async function () {
   const fecha = fechaBase.value;
   if (!fecha) return alert("Selecciona una fecha");
 
-  const scriptUrl = "https://script.google.com/macros/s/AKfycbyy30kCMG18W7uWm2aT8ilddR0Ojg13tceSp-uRwLPwWZQIjhc9K8NpNRM7r_mZ7FN0/exec"; // ⚠️ Reemplaza con tu URL real
+  const scriptUrl = "https://script.google.com/macros/s/AKfycbyy30kCMG18W7uWm2aT8ilddR0Ojg13tceSp-uRwLPwWZQIjhc9K8NpNRM7r_mZ7FN0/exec";
 
   try {
     const res = await fetch(`${scriptUrl}?fecha=${fecha}`);
     const texto = await res.text();
     console.log("Respuesta Apps Script:", texto);
-    await actualizarVista(); // Recarga sin refrescar página
+    await actualizarVista();
     alert("Eventos sincronizados y actualizados en la vista");
   } catch (err) {
     console.error("Error al sincronizar:", err);
