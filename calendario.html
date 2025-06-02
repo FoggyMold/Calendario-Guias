@@ -76,38 +76,6 @@
             alert("Error al sincronizar los eventos");
           });
       }
-
-      // Generar encabezado de horas (07:00 a 20:00 en pasos de 30 min)
-    const header = document.getElementById("horaEncabezado");
-    const lines = document.getElementById("lineasVerticales");
-
-    for (let h = 7; h < 20.5; h += 0.5) {
-      const hora = Math.floor(h);
-      const min = h % 1 === 0 ? "00" : "30";
-      const label = document.createElement("div");
-      label.className = "time-slot";
-      label.textContent = `${hora.toString().padStart(2, '0')}:${min}`;
-      header.appendChild(label);
-
-      const vline = document.createElement("div");
-      vline.className = "v-line";
-      lines.appendChild(vline);
-    }
-
-    // Zoom control
-    const zoomInBtn = document.getElementById("zoom-in");
-    const zoomOutBtn = document.getElementById("zoom-out");
-    zoomInBtn.addEventListener("click", () => {
-      let w = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--slot-width'));
-      w = Math.min(w + 20, 200);
-      document.documentElement.style.setProperty('--slot-width', `${w}px`);
-    });
-
-    zoomOutBtn.addEventListener("click", () => {
-      let w = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--slot-width'));
-      w = Math.max(w - 20, 40);
-      document.documentElement.style.setProperty('--slot-width', `${w}px`);
-    });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" crossorigin="anonymous"></script>
