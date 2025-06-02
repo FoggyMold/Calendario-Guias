@@ -12,40 +12,32 @@
   <body>
 
     <div class="top-bar">
-      <div class="controls">
-        <input type="date" id="fechaBase" />
-        <button class="btn" id="vista-dia">1 Día</button>
-        <button class="btn" id="vista-tres">3 Días</button>
-        <button class="btn" id="zoom-in">🔍 Acercar</button>
-        <button class="btn" id="zoom-out">🔎 Alejar</button>
-        <button class="btn" onclick="sincronizarEventos()">🔄 Sincronizar eventos</button>
-      </div>
-      <a href="index.html" class="btn">← Regresar</a>
+    <div class="controls">
+      <input type="date" id="fechaBase">
+      <button class="btn" id="vista-dia">1 Día</button>
+      <button class="btn" id="vista-tres">3 Días</button>
+      <button class="btn" id="zoom-in">Zoom +</button>
+      <button class="btn" id="zoom-out">Zoom -</button>
+      <button class="btn" onclick="sincronizarEventos()">Sincronizar</button>
+    </div>
+    <h2>Calendario de Guías</h2>
+  </div>
+
+  <div class="calendar-container">
+    <div class="sidebar" id="listaGuias">
+      <!-- Aquí se insertan los guías -->
     </div>
 
-    <div class="calendar-container">
-      <div class="sidebar" id="listaGuias">
-        <!-- Guías se llenarán dinámicamente -->
+    <div class="main-calendar">
+      <div class="time-header" id="ganttHeader">
+        <!-- Horas del encabezado -->
       </div>
 
-      <div class="main-calendar">
-        <!-- Horas -->
-        <div class="time-header" id="horaEncabezado">
-          <script>
-            for (let h = 9; h <= 20; h++) {
-              document.write(`<div>${h.toString().padStart(2, '0')}:00</div>`);
-            }
-          </script>
-        </div>
-
-        <!-- Área para eventos -->
-        <div class="gantt-body">
-          <div class="event-layer" id="ganttCalendar">
-            <!-- Eventos se agregan dinámicamente -->
-          </div>
-        </div>
+      <div class="gantt-body" id="ganttCalendar">
+        <!-- Filas y eventos por guía -->
       </div>
     </div>
+  </div>
 
     <!-- Scripts -->
     <script type="module" src="js/calendario.js"></script>
