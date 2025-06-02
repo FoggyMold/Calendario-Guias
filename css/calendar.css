@@ -1,8 +1,12 @@
-body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
+:root {
+      --slot-width: 80px;
+      --slot-height: 50px;
+    }
+
+    body {
       margin: 0;
-      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
     }
 
     .top-bar {
@@ -14,7 +18,7 @@ body {
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 10;
     }
 
     .controls {
@@ -30,15 +34,13 @@ body {
 
     .sidebar {
       width: 250px;
-      background-color: #fff;
+      background: #fff;
       border-right: 1px solid #ddd;
-      overflow-y: auto;
       padding: 1rem;
+      overflow-y: auto;
     }
 
     .guia-card {
-      display: flex;
-      align-items: center;
       margin-bottom: 1rem;
     }
 
@@ -50,69 +52,58 @@ body {
       border-radius: 4px;
     }
 
-    .guia-info {
-      font-size: 14px;
-    }
-
     .main-calendar {
       flex-grow: 1;
       overflow: auto;
       background: #fff;
-      padding: 0;
-      position: relative;
+    }
+
+    .gantt-wrapper {
+      width: max-content;
     }
 
     .time-header {
       display: flex;
+      background: #f9f9f9;
+      border-bottom: 1px solid #ccc;
       position: sticky;
       top: 0;
-      background: #f9f9f9;
-      z-index: 10;
-      border-bottom: 1px solid #ccc;
+      z-index: 5;
     }
 
-    .time-header div {
-      flex: 1;
+    .time-slot {
+      width: var(--slot-width);
+      height: var(--slot-height);
       text-align: center;
       font-size: 12px;
-      padding: 5px 0;
       border-left: 1px solid #ccc;
-      min-width: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .gantt-body {
+    .grid-body {
       position: relative;
+      display: flex;
     }
 
-    .gantt-body::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+    .vertical-lines {
+      position: relative;
+      display: flex;
+    }
+
+    .v-line {
+      width: var(--slot-width);
+      border-left: 1px solid #e0e0e0;
       height: 100%;
-      background-image: repeating-linear-gradient(
-        to right,
-        transparent,
-        transparent 99px,
-        #e0e0e0 100px
-      );
-      z-index: 0;
+      box-sizing: border-box;
     }
 
-    .event-layer {
+    .event-area {
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      z-index: 1;
-    }
-
-    .gantt-row {
-      position: relative;
-      height: auto;
-      min-height: 30px;
-      border-bottom: 1px solid #eee;
+      width: 100%;
     }
 
     .event-block {
@@ -125,7 +116,6 @@ body {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      color: #fff;
     }
 
     .btn {
