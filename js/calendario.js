@@ -140,7 +140,7 @@ window.sincronizarEventos = async function () {
   const fecha = fechaBase.value;
   if (!fecha) return alert("Selecciona una fecha");
 
-  const scriptUrl = "https://script.google.com/macros/s/AKfycbwA5QHh8hARpglpVPgLk8hqTwJpgItAi_nkerwefyRVmSeKk2I0qD5SQy4G6Z8U46Fs/exec"; // ⚠️ Reemplaza con tu URL real
+  const scriptUrl = "https://script.google.com/macros/s/AKfycbyy30kCMG18W7uWm2aT8ilddR0Ojg13tceSp-uRwLPwWZQIjhc9K8NpNRM7r_mZ7FN0/exec"; // ⚠️ Reemplaza con tu URL real
 
   try {
     const res = await fetch(`${scriptUrl}?fecha=${fecha}`);
