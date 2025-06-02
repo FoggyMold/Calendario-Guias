@@ -12,32 +12,43 @@
   <body>
 
     <div class="top-bar">
-      <div class="controls">
-        <input type="date" id="fechaBase">
-        <button class="btn" id="vista-dia">1 Día</button>
-        <button class="btn" id="vista-tres">3 Días</button>
-        <button class="btn" id="zoom-in">Zoom +</button>
-        <button class="btn" id="zoom-out">Zoom -</button>
-        <button class="btn" onclick="sincronizarEventos()">Sincronizar</button>
-      </div>
-      <h2>Calendario de Guías</h2>
+    <div class="controls">
+      <input type="date" id="fechaBase" />
+      <button class="btn" id="vista-dia">1 Día</button>
+      <button class="btn" id="vista-tres">3 Días</button>
+      <button class="btn" id="zoom-in">🔍 Acercar</button>
+      <button class="btn" id="zoom-out">🔎 Alejar</button>
+      <button class="btn" onclick="sincronizarEventos()">🔄 Sincronizar eventos</button>
+    </div>
+    <a href="index.html" class="btn">← Regresar</a>
+  </div>
+
+  <div class="calendar-container">
+    <div class="sidebar" id="listaGuias">
+      <!-- Guías se llenarán dinámicamente -->
     </div>
 
-    <div class="calendar-container">
-      <div class="sidebar" id="listaGuias">
-        <!-- Aquí se insertan los guías -->
-      </div>
-
-      <div class="main-calendar">
-        <div class="time-header" id="ganttHeader">
-          <!-- Horas del encabezado -->
+    <div class="main-calendar">
+      <div class="gantt-wrapper">
+        <!-- Encabezado de horas -->
+        <div class="time-header" id="horaEncabezado">
+          <!-- Se generará dinámicamente con JS -->
         </div>
 
-        <div class="gantt-body" id="ganttCalendar">
-          <!-- Filas y eventos por guía -->
+        <!-- Cuerpo del calendario -->
+        <div class="grid-body" style="height: 600px;">
+          <div class="vertical-lines" id="lineasVerticales">
+            <!-- Líneas se generan con JS -->
+          </div>
+
+          <!-- Aquí van los eventos -->
+          <div class="event-area" id="ganttCalendar">
+            <!-- Eventos dinámicos -->
+          </div>
         </div>
       </div>
     </div>
+  </div>
 
     <!-- Scripts -->
     <script type="module" src="js/calendario.js"></script>
