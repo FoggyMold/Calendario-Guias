@@ -53,8 +53,13 @@ async function cargarEventos(fechaInicio, dias) {
   for (let i = 0; i < dias; i++) {
     const fechaStr = formatearFecha(sumarDias(fechaInicio, i));
     const snap = await get(ref(db, `eventos/${fechaStr}`));
-    if (snap.exists()) eventos[fechaStr] = snap.val();
-  }
+    if (snap.exists()){ 
+      eventos[fechaStr] = snap.val();
+      console.log("Eventos cargados para", fechaStr, eventos[fechaStr]);
+    } else {
+        console.log("No hay eventos para", fechaStr);
+      }
+    }
 }
 
 // -------- Renderizar --------
