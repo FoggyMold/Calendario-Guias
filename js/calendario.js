@@ -26,7 +26,7 @@ const zoomIn = document.getElementById("zoom-in");
 const zoomOut = document.getElementById("zoom-out");
 
 let diasVista = 1;
-let escalaHora = 60;
+let escalaHora = 60; // Cada hora son 60px
 let guias = {};
 let eventos = {};
 let fechaSeleccionada = new Date();
@@ -42,6 +42,15 @@ function sumarDias(fecha, dias) {
   return f;
 }
 
+function generarHoras() {
+  const horas = [];
+  for (let h = 8; h <= 20; h++) {
+    horas.push(`${h.toString().padStart(2, '0')}:00`);
+    if (h < 20) horas.push(`${h.toString().padStart(2, '0')}:30`);
+  }
+  return horas;
+}
+
 // -------- Cargar datos --------
 async function cargarGuias() {
   const snap = await get(ref(db, "guias"));
@@ -55,9 +64,6 @@ async function cargarEventos(fechaInicio, dias) {
     const snap = await get(ref(db, `eventos/${fechaStr}`));
     if (snap.exists()) {
       eventos[fechaStr] = snap.val();
-      console.log("Eventos cargados para", fechaStr, eventos[fechaStr]);
-    } else {
-      console.log("No hay eventos para", fechaStr);
     }
   }
 }
@@ -79,12 +85,35 @@ function renderizarGuias() {
   });
 }
 
+function renderizarLineasTiempo() {
+  const header = document.getElementById("ganttHeader");
+  header.innerHTML = "";
+  const horas = generarHoras();
+  for (let i = 0; i < diasVista; i++) {
+    const columna = document.createElement("div");
+    columna.className = "hora-dia";
+    columna.style.width = `${escalaHora * horas.length}px`;
+
+    horas.forEach((hora, idx) => {
+      const hDiv = document.createElement("div");
+      hDiv.className = "hora-marca";
+      hDiv.textContent = hora;
+      hDiv.style.left = `${idx * escalaHora}px`;
+      hDiv.style.width = `${escalaHora}px`;
+      columna.appendChild(hDiv);
+    });
+
+    header.appendChild(columna);
+  }
+}
+
 function renderizarGantt(fechaInicio) {
   gantt.innerHTML = "";
-  const horasTotales = 12;
+  const horas = generarHoras();
+  const totalBloques = horas.length;
   const horaInicial = 8;
 
-  // Mostrar eventos sin guía
+  // Renderizar eventos sin guía
   const sinGuiaRow = document.createElement("div");
   sinGuiaRow.className = "gantt-row";
   sinGuiaRow.style.background = "#f9f9f9";
@@ -92,68 +121,72 @@ function renderizarGantt(fechaInicio) {
   for (let i = 0; i < diasVista; i++) {
     const fecha = formatearFecha(sumarDias(fechaInicio, i));
     const eventosDia = eventos[fecha] || {};
+    let posicionY = 0;
 
     Object.entries(eventosDia).forEach(([eid, ev]) => {
       if (!ev.guiaAsignado) {
-        const horaInicio = parseInt(ev.inicio.split(":")[0]);
-        const horaFin = parseInt(ev.fin.split(":")[0]);
-        const duracion = horaFin - horaInicio;
-        const left = ((i * horasTotales) + (horaInicio - horaInicial)) * escalaHora;
-        const width = duracion * escalaHora;
+        const [hIni, mIni] = ev.inicio.split(":").map(Number);
+        const [hFin, mFin] = ev.fin.split(":").map(Number);
+        const inicioMin = hIni * 60 + mIni;
+        const finMin = hFin * 60 + mFin;
+        const duracion = finMin - inicioMin;
+
+        const left = ((i * totalBloques) + ((inicioMin - horaInicial * 60) / 30)) * escalaHora;
+        const width = (duracion / 30) * escalaHora;
 
         const block = document.createElement("div");
         block.className = "event-block";
         block.style.left = `${left}px`;
         block.style.width = `${width}px`;
-        block.style.top = "10px";
+        block.style.top = `${posicionY}px`;
         block.style.background = "#cccccc";
-        block.style.cursor = "pointer";
         block.textContent = `${ev.museo} (${ev.personas})`;
-        block.dataset.eventoId = eid;
-        block.dataset.fecha = fecha;
 
         block.addEventListener("click", () => {
           alert(`Evento sin asignar: ${ev.museo}, ${ev.personas} personas.`);
         });
 
         sinGuiaRow.appendChild(block);
+        posicionY += 30;
       }
     });
   }
 
   gantt.appendChild(sinGuiaRow);
 
-  // Mostrar eventos asignados a cada guía
+  // Renderizar eventos con guía
   Object.entries(guias).forEach(([id, guia]) => {
     const row = document.createElement("div");
     row.className = "gantt-row";
-
     let eventosGuia = 0;
     let personasGuia = 0;
 
     for (let i = 0; i < diasVista; i++) {
       const fecha = formatearFecha(sumarDias(fechaInicio, i));
       const eventosDia = eventos[fecha] || {};
+      let posicionY = 0;
 
       Object.entries(eventosDia).forEach(([eid, ev]) => {
         if (ev.guiaAsignado === id) {
-          const horaInicio = parseInt(ev.inicio.split(":")[0]);
-          const horaFin = parseInt(ev.fin.split(":")[0]);
-          const duracion = horaFin - horaInicio;
-          const left = ((i * horasTotales) + (horaInicio - horaInicial)) * escalaHora;
-          const width = duracion * escalaHora;
+          const [hIni, mIni] = ev.inicio.split(":").map(Number);
+          const [hFin, mFin] = ev.fin.split(":").map(Number);
+          const inicioMin = hIni * 60 + mIni;
+          const finMin = hFin * 60 + mFin;
+          const duracion = finMin - inicioMin;
+
+          const left = ((i * totalBloques) + ((inicioMin - horaInicial * 60) / 30)) * escalaHora;
+          const width = (duracion / 30) * escalaHora;
 
           const block = document.createElement("div");
           block.className = "event-block";
           block.style.left = `${left}px`;
           block.style.width = `${width}px`;
-          block.style.top = "10px";
+          block.style.top = `${posicionY}px`;
           block.style.background = guia.color || "#f9a72d";
           block.textContent = `${ev.museo} (${ev.personas})`;
-          block.dataset.eventoId = eid;
-          block.dataset.fecha = fecha;
 
           row.appendChild(block);
+          posicionY += 30;
           eventosGuia++;
           personasGuia += ev.personas || 0;
         }
@@ -166,12 +199,13 @@ function renderizarGantt(fechaInicio) {
     gantt.appendChild(row);
   });
 
-  gantt.style.width = `${diasVista * escalaHora * 12 + 100}px`;
+  gantt.style.width = `${diasVista * escalaHora * totalBloques}px`;
 }
 
 // -------- Actualizar Vista --------
 async function actualizarVista() {
   await cargarEventos(fechaSeleccionada, diasVista);
+  renderizarLineasTiempo();
   renderizarGuias();
   renderizarGantt(fechaSeleccionada);
 }
@@ -186,11 +220,9 @@ window.sincronizarEventos = async function () {
   try {
     const res = await fetch(`${scriptUrl}?fecha=${fecha}`);
     const texto = await res.text();
-    console.log("Respuesta Apps Script:", texto);
     await actualizarVista();
     alert("Eventos sincronizados y actualizados en la vista");
   } catch (err) {
-    console.error("Error al sincronizar:", err);
     alert("Error al sincronizar eventos");
   }
 };
