@@ -163,6 +163,7 @@ async function actualizarVista() {
   await cargarEventosDesdeFirebase(fechaSeleccionada, diasVista);
   renderizarGuias();
   renderizarGantt(fechaSeleccionada);
+  renderizarEncabezadoHorasYLineas();
 }
 
 // -------- Eventos UI --------
