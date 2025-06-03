@@ -10,6 +10,7 @@
     <title>Calendario de Guías</title>
   </head>
   <body>
+
     <div class="top-bar">
       <div class="controls">
         <input type="date" id="fechaBase" />
@@ -22,33 +23,29 @@
     </div>
 
     <div class="calendar-container">
+      <!-- Barra lateral con los guías -->
       <div class="sidebar" id="listaGuias">
-        <!-- Guías se llenarán dinámicamente -->
+        <!-- Guías dinámicos -->
       </div>
 
+      <!-- Calendario principal -->
       <div class="main-calendar">
         <div class="gantt-wrapper">
           <!-- Encabezado de horas -->
-          <div class="time-header" id="horaEncabezado">
-            <!-- Se generará dinámicamente con JS -->
-          </div>
+          <div class="time-header" id="horaEncabezado"></div>
 
           <!-- Cuerpo del calendario -->
-          <div class="grid-body" style="height: 600px;">
-            <div class="vertical-lines" id="lineasVerticales">
-              <!-- Líneas se generan con JS -->
-            </div>
-
-            <!-- Aquí van los eventos -->
-            <div class="event-area" id="ganttCalendar">
-              <!-- Eventos dinámicos -->
+          <div class="grid-body">
+            <div class="scroll-synced" id="contenedorDeslizable">
+              <div class="vertical-lines" id="lineasVerticales"></div>
+              <div class="event-area" id="ganttCalendar"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- JS del calendario -->
+    <!-- Script principal -->
     <script type="module" src="js/calendario.js"></script>
 
     <!-- Bootstrap y dependencias -->
