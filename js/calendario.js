@@ -188,7 +188,7 @@ fechaBase.addEventListener("change", async () => {
   fechaSeleccionada = new Date(fechaBase.value);
 
   // Llamar a tu Apps Script para sincronizar automáticamente
-  const scriptUrl = "https://script.google.com/macros/library/d/11lvkSYaMMMQZlQLOjU9yRjB4FXkPCwSrTzNYFMQB8zyJNORQ-1IHJxKZ/10";
+  const scriptUrl = "https://script.google.com/macros/library/d/11lvkSYaMMMQZlQLOjU9yRjB4FXkPCwSrTzNYFMQB8zyJNORQ-1IHJxKZ/11";
   try {
     const res = await fetch(`${scriptUrl}?fecha=${fechaBase.value}`);
     const data = await res.json();
