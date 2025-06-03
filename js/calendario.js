@@ -19,6 +19,10 @@ const db = getDatabase(app);
 // DOM
 const listaGuias = document.getElementById("listaGuias");
 const gantt = document.getElementById("ganttCalendar");
+const horaEncabezado = document.getElementById("horaEncabezado");
+const lineasVerticales = document.getElementById("lineasVerticales");
+const contenedorScroll = document.querySelector(".grid-body");
+
 const fechaBase = document.getElementById("fechaBase");
 const btnDia = document.getElementById("vista-dia");
 const btnTres = document.getElementById("vista-tres");
@@ -82,10 +86,10 @@ function renderizarGuias() {
 function renderizarGantt(fechaInicio) {
   gantt.innerHTML = "";
 
-  const horasTotales = 13; // De 7 a 20
   const horaInicial = 7;
+  const horaFinal = 20;
   const eventoAltura = 28;
-  let nivelesPorDia = {};
+  const nivelesPorDia = {};
 
   for (let i = 0; i < diasVista; i++) {
     const fecha = formatearFecha(sumarDias(fechaInicio, i));
@@ -99,7 +103,7 @@ function renderizarGantt(fechaInicio) {
       const finMin = hFin * 60 + mFin;
 
       const duracion = finMin - inicioMin;
-      const left = ((i * horasTotales * 60) + (inicioMin - horaInicial * 60)) * (escalaHora / 60);
+      const left = ((i * (horaFinal - horaInicial) * 60) + (inicioMin - horaInicial * 60)) * (escalaHora / 60);
       const width = duracion * (escalaHora / 60);
       const top = nivelesPorDia[fecha] * (eventoAltura + 4);
       nivelesPorDia[fecha]++;
@@ -115,13 +119,11 @@ function renderizarGantt(fechaInicio) {
     });
   }
 
-  gantt.style.width = `${diasVista * escalaHora * horasTotales + 100}px`;
+  gantt.style.width = `${diasVista * escalaHora * (horaFinal - horaInicial)}px`;
 }
 
+// -------- Horas y líneas verticales --------
 function renderizarEncabezadoHorasYLineas() {
-  const horaEncabezado = document.getElementById("horaEncabezado");
-  const lineasVerticales = document.getElementById("lineasVerticales");
-
   horaEncabezado.innerHTML = "";
   lineasVerticales.innerHTML = "";
 
@@ -130,40 +132,34 @@ function renderizarEncabezadoHorasYLineas() {
   const intervalosPorHora = 2; // cada 30 min
   const totalColumnas = (horaFinal - horaInicial) * intervalosPorHora;
 
+  const slotWidth = escalaHora / 2;
+  document.documentElement.style.setProperty("--slot-width", `${slotWidth}px`);
+
   for (let i = 0; i <= totalColumnas; i++) {
     const minutos = i * 30;
     const hora = Math.floor(minutos / 60) + horaInicial;
     const min = minutos % 60;
     const horaTexto = `${hora.toString().padStart(2, "0")}:${min === 0 ? "00" : "30"}`;
 
-    // Encabezado de hora (solo cada hora completa)
-    if (min === 0) {
-      const div = document.createElement("div");
-      div.textContent = horaTexto;
-      div.style.width = `${escalaHora}px`;
-      horaEncabezado.appendChild(div);
-    } else {
-      const div = document.createElement("div");
-      div.style.width = `${escalaHora}px`;
-      div.style.visibility = "hidden"; // invisible para mantener alineación
-      horaEncabezado.appendChild(div);
-    }
+    const divHora = document.createElement("div");
+    divHora.textContent = horaTexto;
+    divHora.style.width = `${slotWidth}px`;
+    horaEncabezado.appendChild(divHora);
 
-    // Línea vertical
     const linea = document.createElement("div");
     linea.className = "line";
-    linea.style.width = `${escalaHora}px`;
+    linea.style.width = `${slotWidth}px`;
     lineasVerticales.appendChild(linea);
   }
 }
 
-// -------- Cargar y renderizar --------
+// -------- Actualizar Vista Completa --------
 async function actualizarVista() {
   if (!fechaSeleccionada) return;
   await cargarEventosDesdeFirebase(fechaSeleccionada, diasVista);
   renderizarGuias();
-  renderizarGantt(fechaSeleccionada);
   renderizarEncabezadoHorasYLineas();
+  renderizarGantt(fechaSeleccionada);
 }
 
 // -------- Eventos UI --------
@@ -189,10 +185,10 @@ zoomOut.addEventListener("click", () => {
 
 fechaBase.addEventListener("change", async () => {
   if (!fechaBase.value) return;
-
   fechaSeleccionada = new Date(fechaBase.value);
-  const scriptUrl = "https://script.google.com/macros/s/AKfycbwqWq0vovAltyEzBE0pbFX0W3pmvCYEwAz0wI3iGyli8FlblbmbcYTMk6gPFBsZ5gqE/exec";
 
+  // Llamar a tu Apps Script para sincronizar automáticamente
+  const scriptUrl = "https://script.google.com/macros/s/AKfycbwqWq0vovAltyEzBE0pbFX0W3pmvCYEwAz0wI3iGyli8FlblbmbcYTMk6gPFBsZ5gqE/exec";
   try {
     const res = await fetch(`${scriptUrl}?fecha=${fechaBase.value}`);
     const data = await res.json();
@@ -200,12 +196,11 @@ fechaBase.addEventListener("change", async () => {
     await actualizarVista();
   } catch (err) {
     console.error("Error al sincronizar eventos:", err);
-    alert("No se pudieron cargar los eventos.");
+    alert("Error al sincronizar eventos");
   }
 });
 
-// -------- Inicializar --------
-(async () => {
-  await cargarGuias();
-  // No se carga ninguna fecha automáticamente
-})();
+// -------- Sincronizar scroll horizontal --------
+contenedorScroll.addEventListener("scroll", () => {
+  horaEncabezado.scrollLeft = contenedorScroll.scrollLeft;
+});
