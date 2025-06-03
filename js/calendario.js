@@ -113,7 +113,7 @@ function renderizarGantt(fechaInicio) {
       block.style.left = `${left}px`;
       block.style.width = `${width}px`;
       block.style.top = `${top}px`;
-      block.textContent = `${ev.museo} (${ev.personas})`;
+      block.textContent = ev.tituloOriginal || `${ev.museo} (${ev.personas})`;
 
       gantt.appendChild(block);
     });
