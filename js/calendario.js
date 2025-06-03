@@ -29,7 +29,7 @@ let diasVista = 1;
 let escalaHora = 60;
 let guias = {};
 let eventos = {};
-let fechaSeleccionada = new Date();
+let fechaSeleccionada = null;
 
 // -------- Utilidades --------
 function formatearFecha(date) {
@@ -48,7 +48,7 @@ async function cargarGuias() {
   guias = snap.exists() ? snap.val() : {};
 }
 
-async function cargarEventos(fechaInicio, dias) {
+async function cargarEventosDesdeFirebase(fechaInicio, dias) {
   eventos = {};
   for (let i = 0; i < dias; i++) {
     const fechaStr = formatearFecha(sumarDias(fechaInicio, i));
@@ -62,7 +62,7 @@ async function cargarEventos(fechaInicio, dias) {
   }
 }
 
-// -------- Renderizar --------
+// -------- Renderizado --------
 function renderizarGuias() {
   listaGuias.innerHTML = "";
   Object.entries(guias).forEach(([id, guia]) => {
@@ -81,119 +81,89 @@ function renderizarGuias() {
 
 function renderizarGantt(fechaInicio) {
   gantt.innerHTML = "";
-  const horasTotales = 12;
-  const horaInicial = 8;
 
-  // Mostrar eventos sin guía
-  const sinGuiaRow = document.createElement("div");
-  sinGuiaRow.className = "gantt-row";
-  sinGuiaRow.style.background = "#f9f9f9";
+  const horasTotales = 13; // De 7 a 20
+  const horaInicial = 7;
+  const eventoAltura = 28;
+  let nivelesPorDia = {};
 
   for (let i = 0; i < diasVista; i++) {
     const fecha = formatearFecha(sumarDias(fechaInicio, i));
     const eventosDia = eventos[fecha] || {};
+    nivelesPorDia[fecha] = 0;
 
     Object.entries(eventosDia).forEach(([eid, ev]) => {
-      if (!ev.guiaAsignado) {
-        const horaInicio = parseInt(ev.inicio.split(":")[0]);
-        const horaFin = parseInt(ev.fin.split(":")[0]);
-        const duracion = horaFin - horaInicio;
-        const left = ((i * horasTotales) + (horaInicio - horaInicial)) * escalaHora;
-        const width = duracion * escalaHora;
+      const [hInicio, mInicio] = ev.inicio.split(":").map(Number);
+      const [hFin, mFin] = ev.fin.split(":").map(Number);
+      const inicioMin = hInicio * 60 + mInicio;
+      const finMin = hFin * 60 + mFin;
 
-        const block = document.createElement("div");
-        block.className = "event-block";
-        block.style.left = `${left}px`;
-        block.style.width = `${width}px`;
-        block.style.top = "10px";
-        block.style.background = "#cccccc";
-        block.style.cursor = "pointer";
-        block.textContent = `${ev.museo} (${ev.personas})`;
-        block.dataset.eventoId = eid;
-        block.dataset.fecha = fecha;
+      const duracion = finMin - inicioMin;
+      const left = ((i * horasTotales * 60) + (inicioMin - horaInicial * 60)) * (escalaHora / 60);
+      const width = duracion * (escalaHora / 60);
+      const top = nivelesPorDia[fecha] * (eventoAltura + 4);
+      nivelesPorDia[fecha]++;
 
-        block.addEventListener("click", () => {
-          alert(`Evento sin asignar: ${ev.museo}, ${ev.personas} personas.`);
-        });
+      const block = document.createElement("div");
+      block.className = "event-block";
+      block.style.left = `${left}px`;
+      block.style.width = `${width}px`;
+      block.style.top = `${top}px`;
+      block.textContent = `${ev.museo} (${ev.personas})`;
 
-        sinGuiaRow.appendChild(block);
-      }
+      gantt.appendChild(block);
     });
   }
 
-  gantt.appendChild(sinGuiaRow);
-
-  // Mostrar eventos asignados a cada guía
-  Object.entries(guias).forEach(([id, guia]) => {
-    const row = document.createElement("div");
-    row.className = "gantt-row";
-
-    let eventosGuia = 0;
-    let personasGuia = 0;
-
-    for (let i = 0; i < diasVista; i++) {
-      const fecha = formatearFecha(sumarDias(fechaInicio, i));
-      const eventosDia = eventos[fecha] || {};
-
-      Object.entries(eventosDia).forEach(([eid, ev]) => {
-        if (ev.guiaAsignado === id) {
-          const horaInicio = parseInt(ev.inicio.split(":")[0]);
-          const horaFin = parseInt(ev.fin.split(":")[0]);
-          const duracion = horaFin - horaInicio;
-          const left = ((i * horasTotales) + (horaInicio - horaInicial)) * escalaHora;
-          const width = duracion * escalaHora;
-
-          const block = document.createElement("div");
-          block.className = "event-block";
-          block.style.left = `${left}px`;
-          block.style.width = `${width}px`;
-          block.style.top = "10px";
-          block.style.background = guia.color || "#f9a72d";
-          block.textContent = `${ev.museo} (${ev.personas})`;
-          block.dataset.eventoId = eid;
-          block.dataset.fecha = fecha;
-
-          row.appendChild(block);
-          eventosGuia++;
-          personasGuia += ev.personas || 0;
-        }
-      });
-    }
-
-    const info = document.getElementById(`info-${id}`);
-    if (info) info.textContent = `${eventosGuia} eventos / ${personasGuia} pers.`;
-
-    gantt.appendChild(row);
-  });
-
-  gantt.style.width = `${diasVista * escalaHora * 12 + 100}px`;
+  gantt.style.width = `${diasVista * escalaHora * horasTotales + 100}px`;
 }
 
-// -------- Actualizar Vista --------
+function renderizarEncabezadoHorasYLineas() {
+  const horaEncabezado = document.getElementById("horaEncabezado");
+  const lineasVerticales = document.getElementById("lineasVerticales");
+
+  horaEncabezado.innerHTML = "";
+  lineasVerticales.innerHTML = "";
+
+  const horaInicial = 7;
+  const horaFinal = 20;
+  const intervalosPorHora = 2; // cada 30 min
+  const totalColumnas = (horaFinal - horaInicial) * intervalosPorHora;
+
+  for (let i = 0; i <= totalColumnas; i++) {
+    const minutos = i * 30;
+    const hora = Math.floor(minutos / 60) + horaInicial;
+    const min = minutos % 60;
+    const horaTexto = `${hora.toString().padStart(2, "0")}:${min === 0 ? "00" : "30"}`;
+
+    // Encabezado de hora (solo cada hora completa)
+    if (min === 0) {
+      const div = document.createElement("div");
+      div.textContent = horaTexto;
+      div.style.width = `${escalaHora}px`;
+      horaEncabezado.appendChild(div);
+    } else {
+      const div = document.createElement("div");
+      div.style.width = `${escalaHora}px`;
+      div.style.visibility = "hidden"; // invisible para mantener alineación
+      horaEncabezado.appendChild(div);
+    }
+
+    // Línea vertical
+    const linea = document.createElement("div");
+    linea.className = "line";
+    linea.style.width = `${escalaHora}px`;
+    lineasVerticales.appendChild(linea);
+  }
+}
+
+// -------- Cargar y renderizar --------
 async function actualizarVista() {
-  await cargarEventos(fechaSeleccionada, diasVista);
+  if (!fechaSeleccionada) return;
+  await cargarEventosDesdeFirebase(fechaSeleccionada, diasVista);
   renderizarGuias();
   renderizarGantt(fechaSeleccionada);
 }
-
-// -------- Sincronizar con Apps Script --------
-window.sincronizarEventos = async function () {
-  const fecha = fechaBase.value;
-  if (!fecha) return alert("Selecciona una fecha");
-
-  const scriptUrl = "https://script.google.com/macros/s/AKfycbzHp67ra-6CUuH-gao0GlUz6rgAgr-LFauKmdn1gj0ykxEqPz6E0NjeTBz3Z4cBArLI/exec";
-
-  try {
-    const res = await fetch(`${scriptUrl}?fecha=${fecha}`);
-    const texto = await res.text();
-    console.log("Respuesta Apps Script:", texto);
-    await actualizarVista();
-    alert("Eventos sincronizados y actualizados en la vista");
-  } catch (err) {
-    console.error("Error al sincronizar:", err);
-    alert("Error al sincronizar eventos");
-  }
-};
 
 // -------- Eventos UI --------
 btnDia.addEventListener("click", () => {
@@ -217,15 +187,24 @@ zoomOut.addEventListener("click", () => {
 });
 
 fechaBase.addEventListener("change", async () => {
+  if (!fechaBase.value) return;
+
   fechaSeleccionada = new Date(fechaBase.value);
-  await actualizarVista();
+  const scriptUrl = "https://script.google.com/macros/s/AKfycbwqWq0vovAltyEzBE0pbFX0W3pmvCYEwAz0wI3iGyli8FlblbmbcYTMk6gPFBsZ5gqE/exec";
+
+  try {
+    const res = await fetch(`${scriptUrl}?fecha=${fechaBase.value}`);
+    const data = await res.json();
+    console.log("Eventos sincronizados:", data);
+    await actualizarVista();
+  } catch (err) {
+    console.error("Error al sincronizar eventos:", err);
+    alert("No se pudieron cargar los eventos.");
+  }
 });
 
 // -------- Inicializar --------
 (async () => {
   await cargarGuias();
-  const hoy = new Date();
-  fechaBase.value = formatearFecha(hoy);
-  fechaSeleccionada = hoy;
-  await actualizarVista();
+  // No se carga ninguna fecha automáticamente
 })();
