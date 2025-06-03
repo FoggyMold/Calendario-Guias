@@ -70,13 +70,23 @@ async function cargarEventosDesdeFirebase(fechaInicio, dias) {
 function renderizarGuias() {
   listaGuias.innerHTML = "";
   Object.entries(guias).forEach(([id, guia]) => {
+    let eventosAsignados = 0;
+    let totalPersonas = 0;
+
+    Object.values(eventos[formatearFecha(fechaSeleccionada)] || {}).forEach(evento => {
+      if (evento.guiaAsignado === id) {
+        eventosAsignados++;
+        totalPersonas += evento.personas || 0;
+      }
+    });
+
     const div = document.createElement("div");
     div.className = "guia-card";
     div.innerHTML = `
       <div class="guia-color" style="background:${guia.color || "#ccc"}"></div>
       <div class="guia-info">
         <strong>${guia.nombre}</strong><br>
-        <span id="info-${id}">0 eventos / 0 pers.</span>
+        <span>${eventosAsignados} eventos / ${totalPersonas} pers.</span>
       </div>
     `;
     listaGuias.appendChild(div);
@@ -97,8 +107,8 @@ function renderizarGantt(fechaInicio) {
     nivelesPorDia[fecha] = 0;
 
     Object.entries(eventosDia).forEach(([eid, ev]) => {
-      const [hInicio, mInicio] = ev.inicio.split(":").map(Number);
-      const [hFin, mFin] = ev.fin.split(":").map(Number);
+      const [hInicio, mInicio] = ev.inicio.split(":" ).map(Number);
+      const [hFin, mFin] = ev.fin.split(":" ).map(Number);
       const inicioMin = hInicio * 60 + mInicio;
       const finMin = hFin * 60 + mFin;
 
@@ -156,6 +166,7 @@ function renderizarEncabezadoHorasYLineas() {
 // -------- Actualizar Vista Completa --------
 async function actualizarVista() {
   if (!fechaSeleccionada) return;
+  await cargarGuias();
   await cargarEventosDesdeFirebase(fechaSeleccionada, diasVista);
   renderizarGuias();
   renderizarEncabezadoHorasYLineas();
@@ -187,7 +198,6 @@ fechaBase.addEventListener("change", async () => {
   if (!fechaBase.value) return;
   fechaSeleccionada = new Date(fechaBase.value);
 
-  // Llamar a tu Apps Script para sincronizar automáticamente
   const scriptUrl = "https://script.google.com/macros/s/AKfycbzHp67ra-6CUuH-gao0GlUz6rgAgr-LFauKmdn1gj0ykxEqPz6E0NjeTBz3Z4cBArLI/exec";
   try {
     const res = await fetch(`${scriptUrl}?fecha=${fechaBase.value}`);
@@ -200,7 +210,6 @@ fechaBase.addEventListener("change", async () => {
   }
 });
 
-// -------- Sincronizar scroll horizontal --------
 contenedorScroll.addEventListener("scroll", () => {
   horaEncabezado.scrollLeft = contenedorScroll.scrollLeft;
 });
