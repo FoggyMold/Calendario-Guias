@@ -102,12 +102,6 @@ body {
 }
 
 /* Área de eventos */
-.grid-body {
-  flex: 1;
-  position: relative;
-  overflow: auto;
-  background: #fff;
-}
 
 .scroll-synced {
   position: relative;
@@ -116,7 +110,7 @@ body {
 
 /* Líneas verticales */
 .vertical-lines {
-  position: flex;
+  position: absolute;
   top: 0;
   left: 0;
   height: 100%;
@@ -125,7 +119,7 @@ body {
   pointer-events: none;
 }
 
-.vertical-lines .line {
+.line {
   border-left: 1px solid #ddd;
   height: 100%;
   box-sizing: border-box;
@@ -141,7 +135,7 @@ body {
 
 /* Posicionamiento correcto de eventos */
 .event-block {
-  position: flex;
+  position: absolute;
   background-color: #2196F3;
   color: white;
   padding: 4px;
