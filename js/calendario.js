@@ -27,9 +27,9 @@ const fechaBase = document.getElementById("fechaBase");
 const zoomIn = document.getElementById("zoom-in");
 const zoomOut = document.getElementById("zoom-out");
 
-let escalaHora = 60; // px por hora
-const escalaMin = Math.floor((window.innerWidth - 220) / ((20 - 7) * 2)); // visible desde 7:00 a 20:00
-const escalaMax = 300; // muestra 5 slots como máximo (2.5 horas)
+let escalaHora = 60;
+const escalaMin = 60;
+const escalaMax = 240;
 let guias = {};
 let eventos = {};
 let fechaSeleccionada = null;
@@ -89,7 +89,6 @@ function renderizarGuias() {
 
 function renderizarGantt(fechaInicio) {
   gantt.innerHTML = "";
-
   const eventoAltura = 28;
   const nivelesPorDia = {};
   const fecha = formatearFecha(fechaInicio);
@@ -97,8 +96,10 @@ function renderizarGantt(fechaInicio) {
   nivelesPorDia[fecha] = 0;
 
   Object.entries(eventosDia).forEach(([eid, ev]) => {
-    const [hInicio, mInicio] = ev.inicio.split(":").map(Number);
-    const [hFin, mFin] = ev.fin.split(":").map(Number);
+    if (!ev.inicio || !ev.fin) return;
+
+    const [hInicio, mInicio] = ev.inicio.split(":" ).map(Number);
+    const [hFin, mFin] = ev.fin.split(":" ).map(Number);
     const inicioMin = hInicio * 60 + mInicio;
     const finMin = hFin * 60 + mFin;
 
@@ -125,7 +126,6 @@ function renderizarGantt(fechaInicio) {
   lineasVerticales.style.width = `${anchoTotal}px`;
 }
 
-// -------- Horas y líneas verticales --------
 function renderizarEncabezadoHorasYLineas() {
   horaEncabezado.innerHTML = "";
   lineasVerticales.innerHTML = "";
