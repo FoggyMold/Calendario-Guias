@@ -21,7 +21,7 @@ const listaGuias = document.getElementById("listaGuias");
 const gantt = document.getElementById("ganttCalendar");
 const horaEncabezado = document.getElementById("horaEncabezado");
 const lineasVerticales = document.getElementById("lineasVerticales");
-const contenedorScroll = document.querySelector(".grid-body");
+const contenedorScroll = document.querySelector(".scroll-synced");
 
 const fechaBase = document.getElementById("fechaBase");
 const zoomIn = document.getElementById("zoom-in");
@@ -61,13 +61,44 @@ async function cargarEventosDesdeFirebase(fechaInicio) {
 }
 
 // -------- Renderizado --------
+
+// Función para detectar en qué nivel vertical poner cada evento para que no se encimen
+function asignarNivelesEventos(eventosDia) {
+  const eventosArray = Object.values(eventosDia).filter(ev => ev.inicio && ev.fin).map(ev => {
+    const [hInicio, mInicio] = ev.inicio.split(":").map(Number);
+    const [hFin, mFin] = ev.fin.split(":").map(Number);
+    return {
+      ev,
+      inicioMin: hInicio * 60 + mInicio,
+      finMin: hFin * 60 + mFin,
+      nivel: 0
+    };
+  });
+
+  eventosArray.sort((a, b) => a.inicioMin - b.inicioMin);
+
+  for (let i = 0; i < eventosArray.length; i++) {
+    let nivel = 0;
+    while (eventosArray.some((e, idx) => idx < i &&
+      e.nivel === nivel &&
+      !(eventosArray[i].inicioMin >= e.finMin || eventosArray[i].finMin <= e.inicioMin)
+    )) {
+      nivel++;
+    }
+    eventosArray[i].nivel = nivel;
+  }
+
+  return eventosArray;
+}
+
 function renderizarGuias() {
   listaGuias.innerHTML = "";
+  const fechaKey = formatearFecha(fechaSeleccionada);
   Object.entries(guias).forEach(([id, guia]) => {
     let eventosAsignados = 0;
     let totalPersonas = 0;
 
-    Object.values(eventos[formatearFecha(fechaSeleccionada)] || {}).forEach(evento => {
+    Object.values(eventos[fechaKey] || {}).forEach(evento => {
       if (evento.guiaAsignado === id) {
         eventosAsignados++;
         totalPersonas += evento.personas || 0;
@@ -90,24 +121,47 @@ function renderizarGuias() {
 function renderizarGantt(fechaInicio) {
   gantt.innerHTML = "";
   const eventoAltura = 28;
-  const nivelesPorDia = {};
   const fecha = formatearFecha(fechaInicio);
   const eventosDia = eventos[fecha] || {};
-  nivelesPorDia[fecha] = 0;
 
-  Object.entries(eventosDia).forEach(([eid, ev]) => {
-    if (!ev.inicio || !ev.fin) return;
+  // Convertir eventos a un array con minutos inicio y fin
+  const eventosArray = Object.entries(eventosDia)
+    .filter(([id, ev]) => ev.inicio && ev.fin)
+    .map(([id, ev]) => {
+      const [hInicio, mInicio] = ev.inicio.split(":").map(Number);
+      const [hFin, mFin] = ev.fin.split(":").map(Number);
+      return {
+        id,
+        ev,
+        inicioMin: hInicio * 60 + mInicio,
+        finMin: hFin * 60 + mFin,
+        nivel: 0
+      };
+    });
 
-    const [hInicio, mInicio] = ev.inicio.split(":" ).map(Number);
-    const [hFin, mFin] = ev.fin.split(":" ).map(Number);
-    const inicioMin = hInicio * 60 + mInicio;
-    const finMin = hFin * 60 + mFin;
+  // Asignar niveles para que no se encimen
+  eventosArray.sort((a, b) => a.inicioMin - b.inicioMin);
+  const niveles = [];
 
+  eventosArray.forEach(evento => {
+    let nivelAsignado = 0;
+    while (true) {
+      const nivelActual = niveles[nivelAsignado];
+      if (!nivelActual || nivelActual <= evento.inicioMin) {
+        niveles[nivelAsignado] = evento.finMin;
+        evento.nivel = nivelAsignado;
+        break;
+      }
+      nivelAsignado++;
+    }
+  });
+
+  // Renderizar eventos
+  eventosArray.forEach(({ ev, inicioMin, finMin, nivel }) => {
     const duracion = finMin - inicioMin;
     const left = (inicioMin - horaInicial * 60) * (escalaHora / 60);
     const width = duracion * (escalaHora / 60);
-    const top = nivelesPorDia[fecha] * (eventoAltura + 4);
-    nivelesPorDia[fecha]++;
+    const top = nivel * (eventoAltura + 4);
 
     const block = document.createElement("div");
     block.className = "event-block";
@@ -119,6 +173,7 @@ function renderizarGantt(fechaInicio) {
     gantt.appendChild(block);
   });
 
+  // Ajustar ancho total del gantt y sus encabezados
   const totalMinutos = (horaFinal - horaInicial) * 60;
   const anchoTotal = totalMinutos * (escalaHora / 60);
   gantt.style.width = `${anchoTotal}px`;
@@ -126,11 +181,12 @@ function renderizarGantt(fechaInicio) {
   lineasVerticales.style.width = `${anchoTotal}px`;
 }
 
+
 function renderizarEncabezadoHorasYLineas() {
   horaEncabezado.innerHTML = "";
   lineasVerticales.innerHTML = "";
 
-  const intervalosPorHora = 2;
+  const intervalosPorHora = 2; // cada 30 minutos
   const totalColumnas = (horaFinal - horaInicial) * intervalosPorHora;
   const slotWidth = escalaHora / 2;
   document.documentElement.style.setProperty("--slot-width", `${slotWidth}px`);
@@ -178,6 +234,7 @@ fechaBase.addEventListener("change", async () => {
   if (!fechaBase.value) return;
   fechaSeleccionada = new Date(fechaBase.value);
 
+  // Llama al Google Apps Script para sincronizar eventos
   const scriptUrl = "https://script.google.com/macros/s/AKfycbzHp67ra-6CUuH-gao0GlUz6rgAgr-LFauKmdn1gj0ykxEqPz6E0NjeTBz3Z4cBArLI/exec";
   try {
     const res = await fetch(`${scriptUrl}?fecha=${fechaBase.value}`);
@@ -190,6 +247,7 @@ fechaBase.addEventListener("change", async () => {
   }
 });
 
+// Sincronizar scroll horizontal
 contenedorScroll.addEventListener("scroll", () => {
   horaEncabezado.scrollLeft = contenedorScroll.scrollLeft;
   lineasVerticales.scrollLeft = contenedorScroll.scrollLeft;
