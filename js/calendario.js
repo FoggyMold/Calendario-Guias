@@ -34,6 +34,9 @@ let guias = {};
 let eventos = {};
 let fechaSeleccionada = null;
 
+const horaInicial = 7;
+const horaFinal = 20;
+
 // -------- Utilidades --------
 function formatearFecha(date) {
   return date.toISOString().split("T")[0];
@@ -87,8 +90,6 @@ function renderizarGuias() {
 function renderizarGantt(fechaInicio) {
   gantt.innerHTML = "";
 
-  const horaInicial = 7;
-  const horaFinal = 20;
   const eventoAltura = 28;
   const nivelesPorDia = {};
   const fecha = formatearFecha(fechaInicio);
@@ -118,9 +119,10 @@ function renderizarGantt(fechaInicio) {
   });
 
   const totalMinutos = (horaFinal - horaInicial) * 60;
-  gantt.style.width = `${totalMinutos * (escalaHora / 60)}px`;
-  horaEncabezado.style.width = gantt.style.width;
-  lineasVerticales.style.width = gantt.style.width;
+  const anchoTotal = totalMinutos * (escalaHora / 60);
+  gantt.style.width = `${anchoTotal}px`;
+  horaEncabezado.style.width = `${anchoTotal}px`;
+  lineasVerticales.style.width = `${anchoTotal}px`;
 }
 
 // -------- Horas y líneas verticales --------
@@ -128,8 +130,6 @@ function renderizarEncabezadoHorasYLineas() {
   horaEncabezado.innerHTML = "";
   lineasVerticales.innerHTML = "";
 
-  const horaInicial = 7;
-  const horaFinal = 20;
   const intervalosPorHora = 2;
   const totalColumnas = (horaFinal - horaInicial) * intervalosPorHora;
   const slotWidth = escalaHora / 2;
@@ -192,4 +192,5 @@ fechaBase.addEventListener("change", async () => {
 
 contenedorScroll.addEventListener("scroll", () => {
   horaEncabezado.scrollLeft = contenedorScroll.scrollLeft;
+  lineasVerticales.scrollLeft = contenedorScroll.scrollLeft;
 });
