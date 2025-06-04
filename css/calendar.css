@@ -1,12 +1,8 @@
-:root {
-  --slot-width: 60px; /* inicial, pero se actualiza con JS */
-}
-.time-header div,
-.vertical-lines .line {
-  width: var(--slot-width);
-}
-
 /* === Calendario CSS === */
+
+:root {
+  --slot-width: 60px;
+}
 
 body {
   margin: 0;
@@ -88,12 +84,11 @@ body {
 .time-header {
   display: flex;
   height: 40px;
+  border-bottom: 1px solid #ccc;
   background: #f0f0f0;
   overflow-x: hidden;
-  font-size: 0.8rem;
-  border-bottom: 1px solid #ccc;
   white-space: nowrap;
-  position: relative;
+  font-size: 0.8rem;
 }
 
 .time-header div {
@@ -103,6 +98,7 @@ body {
   padding-top: 10px;
   box-sizing: border-box;
   flex-shrink: 0;
+  width: var(--slot-width);
 }
 
 /* Área de eventos */
@@ -126,6 +122,7 @@ body {
   height: 100%;
   display: flex;
   z-index: 1;
+  pointer-events: none;
 }
 
 .vertical-lines .line {
@@ -133,6 +130,7 @@ body {
   height: 100%;
   box-sizing: border-box;
   flex-shrink: 0;
+  width: var(--slot-width);
 }
 
 /* Eventos */
