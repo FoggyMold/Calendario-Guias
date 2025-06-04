@@ -24,12 +24,9 @@ const lineasVerticales = document.getElementById("lineasVerticales");
 const contenedorScroll = document.querySelector(".grid-body");
 
 const fechaBase = document.getElementById("fechaBase");
-const btnDia = document.getElementById("vista-dia");
-const btnTres = document.getElementById("vista-tres");
 const zoomIn = document.getElementById("zoom-in");
 const zoomOut = document.getElementById("zoom-out");
 
-let diasVista = 1;
 let escalaHora = 60;
 let guias = {};
 let eventos = {};
@@ -52,17 +49,15 @@ async function cargarGuias() {
   guias = snap.exists() ? snap.val() : {};
 }
 
-async function cargarEventosDesdeFirebase(fechaInicio, dias) {
+async function cargarEventosDesdeFirebase(fechaInicio) {
   eventos = {};
-  for (let i = 0; i < dias; i++) {
-    const fechaStr = formatearFecha(sumarDias(fechaInicio, i));
-    const snap = await get(ref(db, `eventos/${fechaStr}`));
-    if (snap.exists()) {
-      eventos[fechaStr] = snap.val();
-      console.log("Eventos cargados para", fechaStr, eventos[fechaStr]);
-    } else {
-      console.log("No hay eventos para", fechaStr);
-    }
+  const fechaStr = formatearFecha(fechaInicio);
+  const snap = await get(ref(db, `eventos/${fechaStr}`));
+  if (snap.exists()) {
+    eventos[fechaStr] = snap.val();
+    console.log("Eventos cargados para", fechaStr, eventos[fechaStr]);
+  } else {
+    console.log("No hay eventos para", fechaStr);
   }
 }
 
@@ -100,36 +95,33 @@ function renderizarGantt(fechaInicio) {
   const horaFinal = 20;
   const eventoAltura = 28;
   const nivelesPorDia = {};
+  const fecha = formatearFecha(fechaInicio);
+  const eventosDia = eventos[fecha] || {};
+  nivelesPorDia[fecha] = 0;
 
-  for (let i = 0; i < diasVista; i++) {
-    const fecha = formatearFecha(sumarDias(fechaInicio, i));
-    const eventosDia = eventos[fecha] || {};
-    nivelesPorDia[fecha] = 0;
+  Object.entries(eventosDia).forEach(([eid, ev]) => {
+    const [hInicio, mInicio] = ev.inicio.split(":" ).map(Number);
+    const [hFin, mFin] = ev.fin.split(":" ).map(Number);
+    const inicioMin = hInicio * 60 + mInicio;
+    const finMin = hFin * 60 + mFin;
 
-    Object.entries(eventosDia).forEach(([eid, ev]) => {
-      const [hInicio, mInicio] = ev.inicio.split(":" ).map(Number);
-      const [hFin, mFin] = ev.fin.split(":" ).map(Number);
-      const inicioMin = hInicio * 60 + mInicio;
-      const finMin = hFin * 60 + mFin;
+    const duracion = finMin - inicioMin;
+    const left = (inicioMin - horaInicial * 60) * (escalaHora / 60);
+    const width = duracion * (escalaHora / 60);
+    const top = nivelesPorDia[fecha] * (eventoAltura + 4);
+    nivelesPorDia[fecha]++;
 
-      const duracion = finMin - inicioMin;
-      const left = ((i * (horaFinal - horaInicial) * 60) + (inicioMin - horaInicial * 60)) * (escalaHora / 60);
-      const width = duracion * (escalaHora / 60);
-      const top = nivelesPorDia[fecha] * (eventoAltura + 4);
-      nivelesPorDia[fecha]++;
+    const block = document.createElement("div");
+    block.className = "event-block";
+    block.style.left = `${left}px`;
+    block.style.width = `${width}px`;
+    block.style.top = `${top}px`;
+    block.textContent = ev.tituloOriginal || `${ev.museo} (${ev.personas})`;
 
-      const block = document.createElement("div");
-      block.className = "event-block";
-      block.style.left = `${left}px`;
-      block.style.width = `${width}px`;
-      block.style.top = `${top}px`;
-      block.textContent = ev.tituloOriginal || `${ev.museo} (${ev.personas})`;
+    gantt.appendChild(block);
+  });
 
-      gantt.appendChild(block);
-    });
-  }
-
-  gantt.style.width = `${diasVista * escalaHora * (horaFinal - horaInicial)}px`;
+  gantt.style.width = `${escalaHora * (horaFinal - horaInicial)}px`;
 }
 
 // -------- Horas y líneas verticales --------
@@ -139,9 +131,8 @@ function renderizarEncabezadoHorasYLineas() {
 
   const horaInicial = 7;
   const horaFinal = 20;
-  const intervalosPorHora = 2; // cada 30 min
+  const intervalosPorHora = 2;
   const totalColumnas = (horaFinal - horaInicial) * intervalosPorHora;
-
   const slotWidth = escalaHora / 2;
   document.documentElement.style.setProperty("--slot-width", `${slotWidth}px`);
 
@@ -161,22 +152,26 @@ function renderizarEncabezadoHorasYLineas() {
     linea.style.width = `${slotWidth}px`;
     lineasVerticales.appendChild(linea);
   }
+
+  horaEncabezado.style.width = `${slotWidth * totalColumnas}px`;
+  lineasVerticales.style.width = `${slotWidth * totalColumnas}px`;
 }
 
 // -------- Actualizar Vista Completa --------
 async function actualizarVista() {
   if (!fechaSeleccionada) return;
   await cargarGuias();
-  await cargarEventosDesdeFirebase(fechaSeleccionada, diasVista);
+  await cargarEventosDesdeFirebase(fechaSeleccionada);
   renderizarGuias();
   renderizarEncabezadoHorasYLineas();
   renderizarGantt(fechaSeleccionada);
 }
 
+// -------- Eventos UI --------
 zoomIn.addEventListener("click", () => {
   escalaHora = Math.min(escalaHora + 10, 200);
-  renderizarEncabezadoHorasYLineas(); // 🔁 Redibujar encabezado y líneas
-  renderizarGantt(fechaSeleccionada); // 🔁 Redibujar eventos
+  renderizarEncabezadoHorasYLineas();
+  renderizarGantt(fechaSeleccionada);
 });
 
 zoomOut.addEventListener("click", () => {
