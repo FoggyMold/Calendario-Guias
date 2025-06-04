@@ -173,25 +173,16 @@ async function actualizarVista() {
   renderizarGantt(fechaSeleccionada);
 }
 
-// -------- Eventos UI --------
-btnDia.addEventListener("click", () => {
-  diasVista = 1;
-  actualizarVista();
-});
-
-btnTres.addEventListener("click", () => {
-  diasVista = 3;
-  actualizarVista();
-});
-
 zoomIn.addEventListener("click", () => {
   escalaHora = Math.min(escalaHora + 10, 200);
-  actualizarVista();
+  renderizarEncabezadoHorasYLineas(); // 🔁 Redibujar encabezado y líneas
+  renderizarGantt(fechaSeleccionada); // 🔁 Redibujar eventos
 });
 
 zoomOut.addEventListener("click", () => {
   escalaHora = Math.max(escalaHora - 10, 30);
-  actualizarVista();
+  renderizarEncabezadoHorasYLineas();
+  renderizarGantt(fechaSeleccionada);
 });
 
 fechaBase.addEventListener("change", async () => {
