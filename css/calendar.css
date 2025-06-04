@@ -75,6 +75,7 @@ body {
 /* --- Calendario principal --- */
 .main-calendar {
   flex: 1;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -101,6 +102,12 @@ body {
 }
 
 /* Área de eventos */
+.grid-body {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  background: #fff;
+}
 
 .scroll-synced {
   position: relative;
@@ -118,7 +125,7 @@ body {
   pointer-events: none;
 }
 
-.line {
+.vertical-lines .line {
   border-left: 1px solid #ddd;
   height: 100%;
   box-sizing: border-box;
@@ -128,11 +135,14 @@ body {
 
 /* Eventos */
 .event-area {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 2;
 }
 
-/* Posicionamiento correcto de eventos */
 .event-block {
   position: absolute;
   background-color: #2196F3;
@@ -141,113 +151,8 @@ body {
   font-size: 12px;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  width: 100%;
   box-sizing: border-box;
   z-index: 10;
-}
-/* Contenedor del calendario */
-#calendario {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 900px;
-  margin: 20px auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Lista de eventos */
-.evento {
-  background-color: #f0f0f0;
-  border-left: 5px solid #ccc;
-  margin: 10px 0;
-  padding: 10px 15px;
-  border-radius: 5px;
-  position: relative;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-/* Cambia el fondo cuando se asigna guía (color dinámico) */
-.evento.asignado {
-  color: #fff;
-}
-
-/* Título del evento */
-.evento .titulo {
-  font-weight: 600;
-  font-size: 1rem;
-  margin-bottom: 8px;
-}
-
-/* Contenedor para el prompt y select */
-.evento .asignacion-guia {
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Input para buscar guía */
-#buscador-guia {
-  padding: 5px 8px;
-  font-size: 0.9rem;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  width: 150px;
-}
-
-/* Select para elegir guía */
-#select-guia {
-  padding: 5px 10px;
-  font-size: 0.9rem;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  cursor: pointer;
-  background-color: #fff;
-  min-width: 180px;
-  transition: border-color 0.3s ease;
-}
-
-#select-guia:hover {
-  border-color: #0078d7;
-}
-
-/* Contenedor lateral de guías y contadores */
-#contadores-guia {
-  margin-top: 30px;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
-  font-size: 0.9rem;
-}
-
-.guia-contador {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.guia-color {
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
-  display: inline-block;
-}
-
-.guia-nombre {
-  font-weight: 600;
-}
-
-.guia-cuenta {
-  margin-left: auto;
-  font-weight: 700;
-  color: #444;
-}
-
-#ganttCalendar {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
+  white-space: nowrap;
+  overflow: hidden;
 }
