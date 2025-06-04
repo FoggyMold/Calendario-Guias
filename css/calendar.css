@@ -141,7 +141,7 @@ body {
 
 /* Posicionamiento correcto de eventos */
 .event-block {
-  position: absolute;
+  position: relative;
   background-color: #2196F3;
   color: white;
   padding: 4px;
