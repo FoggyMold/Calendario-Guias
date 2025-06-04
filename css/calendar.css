@@ -139,15 +139,16 @@ body {
   z-index: 2;
 }
 
+/* Posicionamiento correcto de eventos */
 .event-block {
   position: absolute;
-  height: 28px;
-  background-color: #9fc5e8;
-  color: #000;
-  font-size: 0.75rem;
-  padding: 2px 4px;
-  box-sizing: border-box;
+  background-color: #2196F3;
+  color: white;
+  padding: 4px;
+  font-size: 12px;
   border-radius: 4px;
-  overflow: hidden;
-  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 10;
 }
