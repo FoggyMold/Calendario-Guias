@@ -62,35 +62,6 @@ async function cargarEventosDesdeFirebase(fechaInicio) {
 
 // -------- Renderizado --------
 
-// Función para detectar en qué nivel vertical poner cada evento para que no se encimen
-function asignarNivelesEventos(eventosDia) {
-  const eventosArray = Object.values(eventosDia).filter(ev => ev.inicio && ev.fin).map(ev => {
-    const [hInicio, mInicio] = ev.inicio.split(":").map(Number);
-    const [hFin, mFin] = ev.fin.split(":").map(Number);
-    return {
-      ev,
-      inicioMin: hInicio * 60 + mInicio,
-      finMin: hFin * 60 + mFin,
-      nivel: 0
-    };
-  });
-
-  eventosArray.sort((a, b) => a.inicioMin - b.inicioMin);
-
-  for (let i = 0; i < eventosArray.length; i++) {
-    let nivel = 0;
-    while (eventosArray.some((e, idx) => idx < i &&
-      e.nivel === nivel &&
-      !(eventosArray[i].inicioMin >= e.finMin || eventosArray[i].finMin <= e.inicioMin)
-    )) {
-      nivel++;
-    }
-    eventosArray[i].nivel = nivel;
-  }
-
-  return eventosArray;
-}
-
 function renderizarGuias() {
   listaGuias.innerHTML = "";
   const fechaKey = formatearFecha(fechaSeleccionada);
@@ -121,10 +92,10 @@ function renderizarGuias() {
 function renderizarGantt(fechaInicio) {
   gantt.innerHTML = "";
   const eventoAltura = 28;
+  const espacioEntreNiveles = 4;
   const fecha = formatearFecha(fechaInicio);
   const eventosDia = eventos[fecha] || {};
 
-  // Convertir eventos a un array con minutos inicio y fin
   const eventosArray = Object.entries(eventosDia)
     .filter(([id, ev]) => ev.inicio && ev.fin)
     .map(([id, ev]) => {
@@ -146,8 +117,10 @@ function renderizarGantt(fechaInicio) {
   eventosArray.forEach(evento => {
     let nivelAsignado = 0;
     while (true) {
-      const nivelActual = niveles[nivelAsignado];
-      if (!nivelActual || nivelActual <= evento.inicioMin) {
+      const solapa = niveles.some((nivel, idx) => {
+        return idx === nivelAsignado && nivel > evento.inicioMin;
+      });
+      if (!solapa) {
         niveles[nivelAsignado] = evento.finMin;
         evento.nivel = nivelAsignado;
         break;
@@ -156,12 +129,11 @@ function renderizarGantt(fechaInicio) {
     }
   });
 
-  // Renderizar eventos
   eventosArray.forEach(({ ev, inicioMin, finMin, nivel }) => {
     const duracion = finMin - inicioMin;
     const left = (inicioMin - horaInicial * 60) * (escalaHora / 60);
     const width = duracion * (escalaHora / 60);
-    const top = nivel * (eventoAltura + 4);
+    const top = nivel * (eventoAltura + espacioEntreNiveles);
 
     const block = document.createElement("div");
     block.className = "event-block";
@@ -173,14 +145,12 @@ function renderizarGantt(fechaInicio) {
     gantt.appendChild(block);
   });
 
-  // Ajustar ancho total del gantt y sus encabezados
   const totalMinutos = (horaFinal - horaInicial) * 60;
   const anchoTotal = totalMinutos * (escalaHora / 60);
   gantt.style.width = `${anchoTotal}px`;
   horaEncabezado.style.width = `${anchoTotal}px`;
   lineasVerticales.style.width = `${anchoTotal}px`;
 }
-
 
 function renderizarEncabezadoHorasYLineas() {
   horaEncabezado.innerHTML = "";
