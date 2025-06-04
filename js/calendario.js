@@ -89,7 +89,7 @@ function renderizarGuias() {
   });
 }
 
-function renderizarGantt(fechaInicio) {
+function renderizarGantt(fechaInicio) {function renderizarGantt(fechaInicio) {
   gantt.innerHTML = "";
   const eventoAltura = 28;
   const fecha = formatearFecha(fechaInicio);
