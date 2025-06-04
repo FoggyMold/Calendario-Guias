@@ -156,3 +156,9 @@ body {
   white-space: nowrap;
   overflow: hidden;
 }
+
+#ganttCalendar {
+  width: 100%;
+  height: 100%;
+  overflow: visible; /* o auto, dependiendo de tu diseño */
+}
