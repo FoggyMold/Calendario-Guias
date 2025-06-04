@@ -92,7 +92,6 @@ function renderizarGuias() {
 function renderizarGantt(fechaInicio) {
   gantt.innerHTML = "";
   const eventoAltura = 28;
-  const espacioEntreNiveles = 4;
   const fecha = formatearFecha(fechaInicio);
   const eventosDia = eventos[fecha] || {};
 
@@ -117,10 +116,8 @@ function renderizarGantt(fechaInicio) {
   eventosArray.forEach(evento => {
     let nivelAsignado = 0;
     while (true) {
-      const solapa = niveles.some((nivel, idx) => {
-        return idx === nivelAsignado && nivel > evento.inicioMin;
-      });
-      if (!solapa) {
+      const nivelActual = niveles[nivelAsignado];
+      if (!nivelActual || nivelActual <= evento.inicioMin) {
         niveles[nivelAsignado] = evento.finMin;
         evento.nivel = nivelAsignado;
         break;
@@ -129,11 +126,15 @@ function renderizarGantt(fechaInicio) {
     }
   });
 
+  const minutosTotales = (horaFinal - horaInicial) * 60;
+
   eventosArray.forEach(({ ev, inicioMin, finMin, nivel }) => {
+    if (finMin <= horaInicial * 60 || inicioMin >= horaFinal * 60) return;
+
     const duracion = finMin - inicioMin;
     const left = (inicioMin - horaInicial * 60) * (escalaHora / 60);
     const width = duracion * (escalaHora / 60);
-    const top = nivel * (eventoAltura + espacioEntreNiveles);
+    const top = nivel * (eventoAltura + 4);
 
     const block = document.createElement("div");
     block.className = "event-block";
@@ -145,8 +146,7 @@ function renderizarGantt(fechaInicio) {
     gantt.appendChild(block);
   });
 
-  const totalMinutos = (horaFinal - horaInicial) * 60;
-  const anchoTotal = totalMinutos * (escalaHora / 60);
+  const anchoTotal = minutosTotales * (escalaHora / 60);
   gantt.style.width = `${anchoTotal}px`;
   horaEncabezado.style.width = `${anchoTotal}px`;
   lineasVerticales.style.width = `${anchoTotal}px`;
