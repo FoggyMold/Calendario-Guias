@@ -139,6 +139,7 @@ function crearSelectGuias(eventoId, contenedorEvento) {
 }
 
 function renderizarGantt(fechaInicio) {
+  console.log("🟡 Entrando a renderizarGantt con fecha:", fechaInicio);
   gantt.innerHTML = "";
   const eventoAltura = 28;
   const fecha = formatearFecha(fechaInicio);
@@ -157,6 +158,8 @@ function renderizarGantt(fechaInicio) {
         nivel: 0
       };
     });
+  console.log("🟢 Eventos a mostrar:", Object.keys(eventosDia).length, eventosDia);
+
 
   // Asignar niveles para que no se encimen
   eventosArray.sort((a, b) => a.inicioMin - b.inicioMin);
