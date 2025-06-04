@@ -28,6 +28,8 @@ const zoomIn = document.getElementById("zoom-in");
 const zoomOut = document.getElementById("zoom-out");
 
 let escalaHora = 60;
+const escalaMin = 30;
+const escalaMax = 240;
 let guias = {};
 let eventos = {};
 let fechaSeleccionada = null;
@@ -35,12 +37,6 @@ let fechaSeleccionada = null;
 // -------- Utilidades --------
 function formatearFecha(date) {
   return date.toISOString().split("T")[0];
-}
-
-function sumarDias(fecha, dias) {
-  const f = new Date(fecha);
-  f.setDate(f.getDate() + dias);
-  return f;
 }
 
 // -------- Cargar datos --------
@@ -121,7 +117,10 @@ function renderizarGantt(fechaInicio) {
     gantt.appendChild(block);
   });
 
-  gantt.style.width = `${escalaHora * (horaFinal - horaInicial)}px`;
+  const totalMinutos = (horaFinal - horaInicial) * 60;
+  gantt.style.width = `${totalMinutos * (escalaHora / 60)}px`;
+  horaEncabezado.style.width = gantt.style.width;
+  lineasVerticales.style.width = gantt.style.width;
 }
 
 // -------- Horas y líneas verticales --------
@@ -152,9 +151,6 @@ function renderizarEncabezadoHorasYLineas() {
     linea.style.width = `${slotWidth}px`;
     lineasVerticales.appendChild(linea);
   }
-
-  horaEncabezado.style.width = `${slotWidth * totalColumnas}px`;
-  lineasVerticales.style.width = `${slotWidth * totalColumnas}px`;
 }
 
 // -------- Actualizar Vista Completa --------
@@ -169,15 +165,13 @@ async function actualizarVista() {
 
 // -------- Eventos UI --------
 zoomIn.addEventListener("click", () => {
-  escalaHora = Math.min(escalaHora + 10, 200);
-  renderizarEncabezadoHorasYLineas();
-  renderizarGantt(fechaSeleccionada);
+  escalaHora = Math.min(escalaHora + 10, escalaMax);
+  actualizarVista();
 });
 
 zoomOut.addEventListener("click", () => {
-  escalaHora = Math.max(escalaHora - 10, 30);
-  renderizarEncabezadoHorasYLineas();
-  renderizarGantt(fechaSeleccionada);
+  escalaHora = Math.max(escalaHora - 10, escalaMin);
+  actualizarVista();
 });
 
 fechaBase.addEventListener("change", async () => {
