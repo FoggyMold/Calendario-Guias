@@ -1,3 +1,11 @@
+:root {
+  --slot-width: 60px; /* inicial, pero se actualiza con JS */
+}
+.time-header div,
+.vertical-lines .line {
+  width: var(--slot-width);
+}
+
 /* === Calendario CSS === */
 
 body {
@@ -80,11 +88,12 @@ body {
 .time-header {
   display: flex;
   height: 40px;
-  border-bottom: 1px solid #ccc;
   background: #f0f0f0;
   overflow-x: hidden;
-  white-space: nowrap;
   font-size: 0.8rem;
+  border-bottom: 1px solid #ccc;
+  white-space: nowrap;
+  position: relative;
 }
 
 .time-header div {
