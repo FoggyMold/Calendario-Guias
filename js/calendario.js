@@ -231,6 +231,7 @@ function renderizarGantt(fechaInicio) {
     });
 
     gantt.appendChild(block);
+    console.log("🧱 Evento renderizado:", block.style.left, block.style.width, block.style.top, block.textContent);
   });
 
   const anchoTotal = minutosTotales * (escalaHora / 60);
