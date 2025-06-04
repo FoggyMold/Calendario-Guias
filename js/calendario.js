@@ -1,6 +1,6 @@
 // Importar Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
+import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
 
 // Configuración Firebase
 const firebaseConfig = {
@@ -89,6 +89,55 @@ function renderizarGuias() {
   });
 }
 
+function crearSelectGuias(eventoId, contenedorEvento) {
+  // Crear select para elegir guía
+  const select = document.createElement("select");
+  select.style.marginTop = "4px";
+
+  // Opción inicial
+  const opcionDefault = document.createElement("option");
+  opcionDefault.value = "";
+  opcionDefault.textContent = "-- Asignar guía --";
+  select.appendChild(opcionDefault);
+
+  // Rellenar opciones con guías
+  Object.entries(guias).forEach(([id, guia]) => {
+    const opcion = document.createElement("option");
+    opcion.value = id;
+    opcion.textContent = guia.nombre;
+    select.appendChild(opcion);
+  });
+
+  // Evento cuando se selecciona un guía
+  select.addEventListener("change", async () => {
+    const guiaId = select.value;
+    if (!guiaId) return;
+
+    const fechaKey = formatearFecha(fechaSeleccionada);
+    const eventoRef = ref(db, `eventos/${fechaKey}/${eventoId}`);
+
+    // Actualizar evento en Firebase con guía asignado
+    await update(eventoRef, { guiaAsignado: guiaId });
+
+    // Actualizar datos locales
+    eventos[fechaKey][eventoId].guiaAsignado = guiaId;
+
+    // Cambiar color del evento
+    const colorGuia = guias[guiaId]?.color || "#ccc";
+    contenedorEvento.style.backgroundColor = colorGuia;
+
+    // Remover el select después de asignar
+    select.remove();
+
+    // Actualizar lista de guías (conteos)
+    renderizarGuias();
+
+    alert(`Guía asignado: ${guias[guiaId].nombre}`);
+  });
+
+  return select;
+}
+
 function renderizarGantt(fechaInicio) {
   gantt.innerHTML = "";
   const eventoAltura = 28;
@@ -128,7 +177,7 @@ function renderizarGantt(fechaInicio) {
 
   const minutosTotales = (horaFinal - horaInicial) * 60;
 
-  eventosArray.forEach(({ ev, inicioMin, finMin, nivel }) => {
+  eventosArray.forEach(({ id, ev, inicioMin, finMin, nivel }) => {
     if (finMin <= horaInicial * 60 || inicioMin >= horaFinal * 60) return;
 
     const duracion = finMin - inicioMin;
@@ -141,7 +190,42 @@ function renderizarGantt(fechaInicio) {
     block.style.left = `${left}px`;
     block.style.width = `${width}px`;
     block.style.top = `${top}px`;
-    block.textContent = ev.tituloOriginal || `${ev.museo} (${ev.personas})`;
+
+    // Color según guía asignado o default
+    if (ev.guiaAsignado && guias[ev.guiaAsignado]) {
+      block.style.backgroundColor = guias[ev.guiaAsignado].color;
+    } else {
+      block.style.backgroundColor = "#5a9bd5"; // color default
+    }
+
+    // Mostrar solo el título
+    block.textContent = ev.tituloOriginal || ev.titulo || "Evento";
+
+    // Agregar evento click para asignar guía
+    block.addEventListener("click", () => {
+      // Mostrar prompt con nombres de guías
+      const nombresGuias = Object.values(guias).map(g => g.nombre).join(", ");
+      const guiaElegida = prompt(
+        `Guias disponibles:\n${nombresGuias}\n\nEscribe el nombre exacto del guía para asignar:`
+      );
+      if (!guiaElegida) return;
+
+      // Buscar ID del guía por nombre
+      const guiaSeleccionadaId = Object.entries(guias).find(([id, g]) => g.nombre.toLowerCase() === guiaElegida.toLowerCase())?.[0];
+      if (!guiaSeleccionadaId) {
+        alert("Guía no encontrado.");
+        return;
+      }
+
+      // Crear select para elegir guía debajo del evento
+      if (block.querySelector("select")) {
+        // Si ya existe el select, no hacer nada
+        return;
+      }
+      const selectGuias = crearSelectGuias(id, block);
+      block.appendChild(selectGuias);
+      selectGuias.value = guiaSeleccionadaId; // preseleccionar la guía que eligió en prompt
+    });
 
     gantt.appendChild(block);
   });
@@ -209,16 +293,13 @@ fechaBase.addEventListener("change", async () => {
   try {
     const res = await fetch(`${scriptUrl}?fecha=${fechaBase.value}`);
     const data = await res.json();
-    console.log("Eventos sincronizados:", data);
-    await actualizarVista();
-  } catch (err) {
-    console.error("Error al sincronizar eventos:", err);
-    alert("Error al sincronizar eventos");
+    console.log("Eventos sincronizados desde GAS:", data);
+  } catch (error) {
+    console.error("Error al sincronizar con GAS:", error);
   }
+
+  await actualizarVista();
 });
 
-// Sincronizar scroll horizontal
-contenedorScroll.addEventListener("scroll", () => {
-  horaEncabezado.scrollLeft = contenedorScroll.scrollLeft;
-  lineasVerticales.scrollLeft = contenedorScroll.scrollLeft;
-});
+// Inicializar con hoy o vacío
+fechaSeleccionada = null;
