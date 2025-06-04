@@ -116,7 +116,7 @@ body {
 
 /* Líneas verticales */
 .vertical-lines {
-  position: absolute;
+  position: flex;
   top: 0;
   left: 0;
   height: 100%;
@@ -141,7 +141,7 @@ body {
 
 /* Posicionamiento correcto de eventos */
 .event-block {
-  position: relative;
+  position: flex;
   background-color: #2196F3;
   color: white;
   padding: 4px;
