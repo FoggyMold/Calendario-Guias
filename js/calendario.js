@@ -299,6 +299,12 @@ async function actualizarVista() {
   actualizarVista();
   });
 
+contenedorScroll.addEventListener("scroll", (e) => {
+  const scrollX = e.target.scrollLeft;
+  horaEncabezado.scrollLeft = scrollX;
+  lineasVerticales.style.transform = `translateX(-${scrollX}px)`;
+});
+
 fechaBase.addEventListener("change", async () => {
   if (!fechaBase.value) return;
   fechaSeleccionada = new Date(fechaBase.value);
