@@ -86,7 +86,7 @@ body {
   height: 40px;
   border-bottom: 1px solid #ccc;
   background: #f0f0f0;
-  overflow-x: hidden;
+  overflow-x: auto;
   white-space: nowrap;
   font-size: 0.8rem;
 }
