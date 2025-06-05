@@ -260,10 +260,11 @@ function renderizarEncabezadoHorasYLineas() {
     divHora.style.width = `${slotWidth}px`;
     horaEncabezado.appendChild(divHora);
 
-    const linea = document.createElement("div");
+   /* const linea = document.createElement("div");
     linea.className = "line";
     linea.style.width = `${slotWidth}px`;
     lineasVerticales.appendChild(linea);
+    */
   }
 }
 
