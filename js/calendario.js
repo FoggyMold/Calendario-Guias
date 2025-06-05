@@ -261,11 +261,11 @@ function renderizarEncabezadoHorasYLineas() {
     divHora.style.width = `${slotWidth}px`;
     horaEncabezado.appendChild(divHora);
 
-   /* const linea = document.createElement("div");
+    const linea = document.createElement("div");
     linea.className = "line";
     linea.style.width = `${slotWidth}px`;
     lineasVerticales.appendChild(linea);
-    */
+    
   }
 }
 
@@ -280,15 +280,15 @@ async function actualizarVista() {
 }
 
 // -------- Eventos UI --------
-// zoomIn.addEventListener("click", () => {
- // escalaHora = Math.min(escalaHora + 10, escalaMax);
-  //actualizarVista();
-//});
+  zoomIn.addEventListener("click", () => {
+  escalaHora = Math.min(escalaHora + 10, escalaMax);
+  actualizarVista();
+  });
 
-// zoomOut.addEventListener("click", () => {
-  //escalaHora = Math.max(escalaHora - 10, escalaMin);
-  //actualizarVista();
-//});
+  zoomOut.addEventListener("click", () => {
+  escalaHora = Math.max(escalaHora - 10, escalaMin);
+  actualizarVista();
+  });
 
 fechaBase.addEventListener("change", async () => {
   if (!fechaBase.value) return;
