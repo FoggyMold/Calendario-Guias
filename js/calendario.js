@@ -29,7 +29,7 @@ const zoomIn = document.getElementById("zoom-in");
 const zoomOut = document.getElementById("zoom-out");
 
 let escalaHora = 60;
-const escalaMin = 60;
+let escalaMin = 60;
 const escalaMax = 240;
 let guias = {};
 let eventos = {};
