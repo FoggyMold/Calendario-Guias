@@ -47,6 +47,7 @@ function calcularEscalaInicial() {
   const anchoDisponible = gridBody.clientWidth;
   const totalMinutos = (horaFinal - horaInicial) * 60;
   escalaHora = anchoDisponible / totalMinutos;
+  escalaMin = escalaHora;
 }
 
 // -------- Cargar datos --------
