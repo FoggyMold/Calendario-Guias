@@ -22,6 +22,7 @@ const gantt = document.getElementById("ganttCalendar");
 const horaEncabezado = document.getElementById("horaEncabezado");
 const lineasVerticales = document.getElementById("lineasVerticales");
 const contenedorScroll = document.querySelector(".scroll-synced");
+const gridBody = document.querySelector(".grid-body");
 
 const fechaBase = document.getElementById("fechaBase");
 const zoomIn = document.getElementById("zoom-in");
@@ -40,6 +41,12 @@ const horaFinal = 20;
 // -------- Utilidades --------
 function formatearFecha(date) {
   return date.toISOString().split("T")[0];
+}
+
+function calcularEscalaInicial() {
+  const anchoDisponible = gridBody.clientWidth;
+  const totalMinutos = (horaFinal - horaInicial) * 60;
+  escalaHora = anchoDisponible / totalMinutos;
 }
 
 // -------- Cargar datos --------
@@ -272,6 +279,7 @@ function renderizarEncabezadoHorasYLineas() {
 // -------- Actualizar Vista Completa --------
 async function actualizarVista() {
   if (!fechaSeleccionada) return;
+  calcularEscalaInicial();
   await cargarGuias();
   await cargarEventosDesdeFirebase(fechaSeleccionada);
   renderizarGuias();
