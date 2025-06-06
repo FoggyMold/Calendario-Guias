@@ -244,7 +244,6 @@ function renderizarGantt(fechaInicio) {
 
   const anchoTotal = minutosTotales * (escalaHora / 60);
   gantt.style.width = `${anchoTotal}px`;
-  block.style.border = "2px solid red";
   horaEncabezado.style.width = `${anchoTotal}px`;
   lineasVerticales.style.width = `${anchoTotal}px`;
 }
