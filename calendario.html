@@ -1,57 +1,44 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Calendario Vertical</title>
-  <link rel="stylesheet" href="css/calendar.css" />
+  <meta charset="UTF-8">
+  <title>Conteo de Boletos</title>
 </head>
 <body>
-  <div class="top-bar">
-    <div class="controls">
-      <input type="date" id="fechaBase" />
-    </div>
-    <a href="index.html" class="btn">← Regresar</a>
-  </div>
+  <h2>Selecciona una fecha:</h2>
+  <input type="date" id="fechaInput">
+  <button onclick="consultar()">Consultar boletos</button>
 
-  <div class="calendar-container">
-    <div class="sidebar">
-      <!-- Visualización de guías (sólo placeholder) -->
-      <div class="guia-card">
-        <div class="guia-color" style="background: #f00;"></div>
-        <div class="guia-info">Guía 1</div>
-      </div>
-      <div class="guia-card">
-        <div class="guia-color" style="background: #0a0;"></div>
-        <div class="guia-info">Guía 2</div>
-      </div>
-    </div>
-
-    <div class="main-calendar">
-      <div class="hora-header" id="horaHeader"></div>
-      <div class="zona-de-tiempo" id="zonaTiempo">
-        <div class="lineas-horas" id="lineasHoras"></div>
-        <!-- Aquí se colocarán los eventos más adelante -->
-      </div>
-    </div>
-  </div>
+  <pre id="resultado"></pre>
 
   <script>
-    const horaHeader = document.getElementById('horaHeader');
-    const lineasHoras = document.getElementById('lineasHoras');
+    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbw7lTBqLq5kld-JeuYtDTpxI7YogzBtzM52FFvRM65-mH7F3xdnpYad76IyHNLtbCh6-Q/exec"; // Pon aquí tu URL
 
-    for (let h = 7; h <= 20; h++) {
-      for (let m = 0; m < 60; m += 30) {
-        const hora = document.createElement('div');
-        hora.className = 'hora';
-        const horaTexto = h.toString().padStart(2, '0') + ':' + (m === 0 ? '00' : '30');
-        hora.innerText = horaTexto;
-        horaHeader.appendChild(hora);
+    function consultar() {
+      const input = document.getElementById("fechaInput").value;
+      if (!input) return alert("Selecciona una fecha");
+      const fecha = formatearFechaParaScript(input); // '2 Julio 2025'
 
-        const linea = document.createElement('div');
-        linea.className = 'linea-hora';
-        lineasHoras.appendChild(linea);
-      }
+      fetch(`${https://script.google.com/macros/s/AKfycbw7lTBqLq5kld-JeuYtDTpxI7YogzBtzM52FFvRM65-mH7F3xdnpYad76IyHNLtbCh6-Q/exec}?fecha=${encodeURIComponent(fecha)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) return document.getElementById("resultado").textContent = "❌ " + data.error;
+
+          let texto = "";
+          for (const hora of Object.keys(data).sort()) {
+            const { ex, na } = data[hora];
+            texto += `${hora} → ${ex} Extranjeros, ${na} Nacionales\n`;
+          }
+          document.getElementById("resultado").textContent = texto;
+        });
+    }
+
+    function formatearFechaParaScript(isoDate) {
+      const fecha = new Date(isoDate);
+      const dia = fecha.getDate();
+      const mesNombre = fecha.toLocaleString("es-MX", { month: "long" });
+      const anio = fecha.getFullYear();
+      return `${dia} ${mesNombre.charAt(0).toUpperCase() + mesNombre.slice(1)} ${anio}`;
     }
   </script>
 </body>
