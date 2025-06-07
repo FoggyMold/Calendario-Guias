@@ -1,41 +1,87 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/calendar.css" />
+  <title>Calendario de Guías</title>
+</head>
+<body>
 
-    <link rel="stylesheet" href="css/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/calendar.css" />
+  <div class="top-bar">
+    <div class="controls">
+      <input type="date" id="fechaBase" />
+    </div>
+    <a href="index.html" class="btn">← Regresar</a>
+  </div>
 
-    <title>Calendario de Guías</title>
-  </head>
-  <body>
-
-    <div class="top-bar">
-      <div class="controls">
-        <input type="date" id="fechaBase" />
-      </div>
-      <a href="index.html" class="btn">← Regresar</a>
+  <div class="calendar-container">
+    <!-- Barra lateral con los guías -->
+    <div class="sidebar" id="listaGuias">
+      <!-- Visualización de guías -->
     </div>
 
-    <div class="calendar-container">
-      <!-- Barra lateral con los guías -->
-      <div class="sidebar" id="listaGuias">
-        <!-- Guías dinámicos -->
-      </div>
-      
-      <!-- Calendario principal -->
-      <div class="main-calendar">
-        <div class="gantt-wrapper">
-          <div class="zona-de-tiempo" id="zonaDeTiempo">
-            <!-- Aquí van las horas, líneas y luego los eventos -->
-          </div>
+    <!-- Calendario principal -->
+    <div class="main-calendar">
+      <div class="zona-de-tiempo">
+        <div class="hora-header">
+          <!-- Horas y medias horas -->
+          <div class="hora">09:00</div>
+          <div class="hora">09:30</div>
+          <div class="hora">10:00</div>
+          <div class="hora">10:30</div>
+          <div class="hora">11:00</div>
+          <div class="hora">11:30</div>
+          <div class="hora">12:00</div>
+          <div class="hora">12:30</div>
+          <div class="hora">13:00</div>
+          <div class="hora">13:30</div>
+          <div class="hora">14:00</div>
+          <div class="hora">14:30</div>
+          <div class="hora">15:00</div>
+          <div class="hora">15:30</div>
+          <div class="hora">16:00</div>
+          <div class="hora">16:30</div>
+          <div class="hora">17:00</div>
+          <div class="hora">17:30</div>
+          <div class="hora">18:00</div>
+          <div class="hora">18:30</div>
+          <div class="hora">19:00</div>
+          <div class="hora">19:30</div>
+          <div class="hora">20:00</div>
+        </div>
+        <div class="lineas-horas">
+          <!-- Líneas verticales -->
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
+          <div class="linea-hora"></div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Script principal -->
-    <script type="module" src="js/calendario.js"></script>
+  <script type="module" src="js/calendario.js"></script>
 
     <!-- Bootstrap y dependencias -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" crossorigin="anonymous"></script>
