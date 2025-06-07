@@ -1,83 +1,122 @@
 :root {
-      --columnas: 27; /* 7:00 a 20:00 en intervalos de 30 min */
-    }
+  --slot-width: 80px;
+}
 
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #fdfdfd;
-    }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  background: #fdfdfd;
+}
 
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #f9a72d;
-      padding: 10px;
-      color: white;
-    }
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9a72d;
+  padding: 0.8rem 1rem;
+  color: white;
+  flex-wrap: wrap;
+}
 
-    .calendar-container {
-      display: flex;
-      height: calc(100vh - 50px);
-    }
+.controls input {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.7rem;
+  border: none;
+  border-radius: 5px;
+  background: white;
+  color: #333;
+  cursor: pointer;
+}
 
-    .sidebar {
-      width: 220px;
-      background: #fff;
-      padding: 10px;
-      border-right: 1px solid #ccc;
-      overflow-y: auto;
-    }
+.calendar-container {
+  display: flex;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+}
 
-    .main-calendar {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      min-height: 0;
-    }
+.sidebar {
+  width: 220px;
+  background: #fff;
+  padding: 1rem;
+  overflow-y: auto;
+  border-right: 1px solid #ccc;
+}
 
-    .hora-header {
-      display: grid;
-      grid-template-columns: repeat(var(--columnas), 1fr);
-      height: 40px;
-      background-color: #f0f0f0;
-      border-bottom: 1px solid #ccc;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+.guia-card {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
 
-    .hora {
-      font-size: 10px;
-      text-align: center;
-      padding-top: 10px;
-      border-left: 1px solid #ccc;
-    }
+.guia-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
 
-    .hora:first-child {
-      border-left: none;
-    }
+.guia-info {
+  font-size: 0.9rem;
+}
 
-    .zona-de-tiempo {
-      position: relative;
-      flex: 1;
-      overflow-y: auto;
-      max-height: 100%;
-    }
+.main-calendar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-    .lineas-horas {
-      display: grid;
-      grid-template-columns: repeat(var(--columnas), 1fr);
-      min-height: 800px; /* suficiente espacio vertical */
-      position: relative;
-    }
+.hora-header {
+  display: flex;
+  height: 40px;
+  border-bottom: 1px solid #ccc;
+  background: #f0f0f0;
+  overflow-x: auto;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  position: relative;
+  z-index: 5;
+}
 
-    .linea-hora {
-      border-left: 1px solid #e0e0e0;
-    }
+.hora {
+  height: 100%;
+  width: var(--slot-width);
+  min-width: var(--slot-width);
+  text-align: center;
+  padding-top: 10px;
+  box-sizing: border-box;
+  border-left: 1px solid #ddd;
+}
 
-    .linea-hora:first-child {
-      border-left: none;
-    }
+.hora:first-child {
+  border-left: none;
+}
+
+.zona-de-tiempo {
+  flex: 1;
+  position: relative;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.lineas-horas {
+  display: flex;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.linea-hora {
+  width: var(--slot-width);
+  min-width: var(--slot-width);
+  border-left: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+.linea-hora:first-child {
+  border-left: none;
+}
