@@ -1,5 +1,7 @@
 :root {
-  --slot-width: 60px;
+  --hora-inicial: 7;
+  --hora-final: 20;
+  --cantidad-horas: calc(var(--hora-final) - var(--hora-inicial) + 1);
 }
 
 body {
@@ -12,30 +14,52 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  background-color: #f9a72d;
+  background: #f9a72d;
+  padding: 0.8rem 1rem;
   color: white;
-  border-bottom: 1px solid #ccc;
+  flex-wrap: wrap;
+}
+
+.controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.controls input,
+.controls button {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.7rem;
+  border: none;
+  border-radius: 5px;
+  background: white;
+  color: #333;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  background: #f1f1f1;
 }
 
 .calendar-container {
   display: flex;
-  height: calc(100vh - 50px);
+  height: calc(100vh - 60px);
 }
 
+/* Sidebar */
 .sidebar {
   width: 220px;
-  border-right: 1px solid #ccc;
+  background: #fff;
   padding: 1rem;
-  background-color: #fff;
   overflow-y: auto;
+  border-right: 1px solid #ccc;
 }
 
+/* Calendario principal */
 .main-calendar {
   flex: 1;
   overflow: auto;
   position: relative;
-  background-color: #fff;
 }
 
 .zona-de-tiempo {
@@ -44,49 +68,45 @@ body {
   padding-top: 40px;
 }
 
+/* Encabezado de horas */
 .hora-header {
-  display: flex;
+  display: grid;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 40px;
   background-color: #f0f0f0;
-  z-index: 10;
   border-bottom: 1px solid #ccc;
-  font-size: 0.8rem;
+  z-index: 10;
+  grid-template-columns: repeat(var(--cantidad-horas), 1fr);
 }
 
 .hora {
-  flex: 1;
-  min-width: var(--slot-width);
   text-align: center;
+  font-size: 11px;
   padding-top: 10px;
-  border-left: 1px solid #ddd;
-  box-sizing: border-box;
-  color: #333;
+  border-left: 1px solid #ccc;
 }
 
 .hora:first-child {
   border-left: none;
 }
 
+/* Líneas verticales */
 .lineas-horas {
-  display: flex;
-  height: 100%;
   position: absolute;
   top: 40px;
   left: 0;
   right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--cantidad-horas), 1fr);
   z-index: 1;
-  pointer-events: none;
 }
 
 .linea-hora {
-  flex: 1;
-  min-width: var(--slot-width);
-  border-left: 1px solid #ddd;
-  box-sizing: border-box;
+  border-left: 1px solid #e0e0e0;
 }
 
 .linea-hora:first-child {
