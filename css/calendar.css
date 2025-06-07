@@ -1,12 +1,10 @@
-/* === Calendario CSS === */
-
 :root {
   --slot-width: 60px;
 }
 
 body {
-  margin: 0;
   font-family: 'Segoe UI', sans-serif;
+  margin: 0;
   background: #fdfdfd;
 }
 
@@ -14,153 +12,83 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f9a72d;
-  padding: 0.8rem 1rem;
+  padding: 10px;
+  background-color: #f9a72d;
   color: white;
-  flex-wrap: wrap;
-}
-
-.controls {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.controls input,
-.controls button {
-  font-size: 0.9rem;
-  padding: 0.4rem 0.7rem;
-  border: none;
-  border-radius: 5px;
-  background: white;
-  color: #333;
-  cursor: pointer;
-}
-
-.controls button:hover {
-  background: #f1f1f1;
+  border-bottom: 1px solid #ccc;
 }
 
 .calendar-container {
   display: flex;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 50px);
 }
 
-/* --- Barra lateral de guías --- */
 .sidebar {
   width: 220px;
-  background: #fff;
-  padding: 1rem;
-  overflow-y: auto;
   border-right: 1px solid #ccc;
+  padding: 1rem;
+  background-color: #fff;
+  overflow-y: auto;
 }
 
-.guia-card {
-  margin-bottom: 1rem;
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.guia-color {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-}
-
-.guia-info {
-  font-size: 0.9rem;
-}
-
-/* --- Calendario principal --- */
 .main-calendar {
   flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Encabezado de horas */
-.time-header {
-  display: flex;
-  height: 40px;
-  border-bottom: 1px solid #ccc;
-  background: #f0f0f0;
-  overflow-x: auto;
-  white-space: nowrap;
-  font-size: 0.8rem;
-}
-
-.time-header div {
-  height: 100%;
-  text-align: center;
-  border-left: 1px solid #ddd;
-  padding-top: 10px;
-  box-sizing: border-box;
-  flex-shrink: 0;
-  width: var(--slot-width);
-}
-
-/* Área de eventos */
-.grid-body {
-  flex: 1;
-  position: relative;
   overflow: auto;
-  background: #fff;
-}
-
-.scroll-synced {
   position: relative;
-  min-height: 300%;
+  background-color: #fff;
 }
 
-/* Líneas verticales */
-.vertical-lines {
+.zona-de-tiempo {
+  position: relative;
+  height: 100%;
+  padding-top: 40px;
+}
+
+.hora-header {
+  display: flex;
   position: absolute;
   top: 0;
   left: 0;
-  height: 100%;
+  right: 0;
+  height: 40px;
+  background-color: #f0f0f0;
+  z-index: 10;
+  border-bottom: 1px solid #ccc;
+  font-size: 0.8rem;
+}
+
+.hora {
+  flex: 1;
+  min-width: var(--slot-width);
+  text-align: center;
+  padding-top: 10px;
+  border-left: 1px solid #ddd;
+  box-sizing: border-box;
+  color: #333;
+}
+
+.hora:first-child {
+  border-left: none;
+}
+
+.lineas-horas {
   display: flex;
+  height: 100%;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
   z-index: 1;
   pointer-events: none;
 }
 
-.vertical-lines .line {
+.linea-hora {
+  flex: 1;
+  min-width: var(--slot-width);
   border-left: 1px solid #ddd;
-  height: 100%;
   box-sizing: border-box;
-  flex-shrink: 0;
-  width: var(--slot-width);
 }
 
-/* Eventos */
-.event-area {
-  position: relative;
-  min-height: 300px;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-}
-
-.event-block {
-  position: absolute;
-  background-color: #2196F3;
-  color: white;
-  padding: 4px;
-  font-size: 12px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  box-sizing: border-box;
-  z-index: 1000;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-#ganttCalendar {
-  position: relative;
-  min-height: 300px;
-  overflow: visible; /* o auto, dependiendo de tu diseño */
-  z-index: 999;
+.linea-hora:first-child {
+  border-left: none;
 }
