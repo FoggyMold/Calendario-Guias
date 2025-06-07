@@ -19,7 +19,7 @@
       if (!input) return alert("Selecciona una fecha");
       const fecha = formatearFechaParaScript(input); // '2 Julio 2025'
 
-      fetch(`${https://script.google.com/macros/s/AKfycbw7lTBqLq5kld-JeuYtDTpxI7YogzBtzM52FFvRM65-mH7F3xdnpYad76IyHNLtbCh6-Q/exec}?fecha=${encodeURIComponent(fecha)}`)
+      fetch(`${URL_SCRIPT}?fecha=${encodeURIComponent(fecha)}`)
         .then(res => res.json())
         .then(data => {
           if (data.error) return document.getElementById("resultado").textContent = "❌ " + data.error;
