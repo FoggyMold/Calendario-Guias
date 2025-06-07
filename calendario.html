@@ -1,14 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <link rel="stylesheet" href="css/bootstrap.min.css" />
-  <link rel="stylesheet" href="css/calendar.css" />
-  <title>Calendario de Guías</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calendario Vertical</title>
+  <link rel="stylesheet" href="estilos.css" />
 </head>
 <body>
-
   <div class="top-bar">
     <div class="controls">
       <input type="date" id="fechaBase" />
@@ -17,81 +15,44 @@
   </div>
 
   <div class="calendar-container">
-    <!-- Barra lateral con los guías -->
-    <div class="sidebar" id="listaGuias">
-      <!-- Visualización de guías -->
+    <div class="sidebar">
+      <!-- Visualización de guías (sólo placeholder) -->
+      <div class="guia-card">
+        <div class="guia-color" style="background: #f00;"></div>
+        <div class="guia-info">Guía 1</div>
+      </div>
+      <div class="guia-card">
+        <div class="guia-color" style="background: #0a0;"></div>
+        <div class="guia-info">Guía 2</div>
+      </div>
     </div>
 
     <div class="main-calendar">
-      <div class="hora-header">
-        <!-- Horas con medias horas -->
-        <div class="hora">7:00</div>
-        <div class="hora">7:30</div>
-        <div class="hora">8:00</div>
-        <div class="hora">8:30</div>
-        <div class="hora">9:00</div>
-        <div class="hora">9:30</div>
-        <div class="hora">10:00</div>
-        <div class="hora">10:30</div>
-        <div class="hora">11:00</div>
-        <div class="hora">11:30</div>
-        <div class="hora">12:00</div>
-        <div class="hora">12:30</div>
-        <div class="hora">13:00</div>
-        <div class="hora">13:30</div>
-        <div class="hora">14:00</div>
-        <div class="hora">14:30</div>
-        <div class="hora">15:00</div>
-        <div class="hora">15:30</div>
-        <div class="hora">16:00</div>
-        <div class="hora">16:30</div>
-        <div class="hora">17:00</div>
-        <div class="hora">17:30</div>
-        <div class="hora">18:00</div>
-        <div class="hora">18:30</div>
-        <div class="hora">19:00</div>
-        <div class="hora">19:30</div>
-        <div class="hora">20:00</div>
+      <div class="hora-header" id="horaHeader"></div>
+      <div class="zona-de-tiempo" id="zonaTiempo">
+        <div class="lineas-horas" id="lineasHoras"></div>
+        <!-- Aquí se colocarán los eventos más adelante -->
       </div>
-
-      <div class="zona-de-tiempo">
-        <div class="lineas-horas">
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-          <div class="linea-hora"></div>
-        </div>
-      </div>
+    </div>
   </div>
 
-  <script type="module" src="js/calendario.js"></script>
+  <script>
+    const horaHeader = document.getElementById('horaHeader');
+    const lineasHoras = document.getElementById('lineasHoras');
 
-    <!-- Bootstrap y dependencias -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="js/bootstrap.min.js"></script>
-  </body>
+    for (let h = 7; h <= 20; h++) {
+      for (let m = 0; m < 60; m += 30) {
+        const hora = document.createElement('div');
+        hora.className = 'hora';
+        const horaTexto = h.toString().padStart(2, '0') + ':' + (m === 0 ? '00' : '30');
+        hora.innerText = horaTexto;
+        horaHeader.appendChild(hora);
+
+        const linea = document.createElement('div');
+        linea.className = 'linea-hora';
+        lineasHoras.appendChild(linea);
+      }
+    }
+  </script>
+</body>
 </html>
