@@ -97,54 +97,6 @@ function renderizarGuias() {
   });
 }
 
-function crearSelectGuias(eventoId, contenedorEvento) {
-  // Crear select para elegir guía
-  const select = document.createElement("select");
-  select.style.marginTop = "4px";
-
-  // Opción inicial
-  const opcionDefault = document.createElement("option");
-  opcionDefault.value = "";
-  opcionDefault.textContent = "-- Asignar guía --";
-  select.appendChild(opcionDefault);
-
-  // Rellenar opciones con guías
-  Object.entries(guias).forEach(([id, guia]) => {
-    const opcion = document.createElement("option");
-    opcion.value = id;
-    opcion.textContent = guia.nombre;
-    select.appendChild(opcion);
-  });
-
-  // Evento cuando se selecciona un guía
-  select.addEventListener("change", async () => {
-    const guiaId = select.value;
-    if (!guiaId) return;
-
-    const fechaKey = formatearFecha(fechaSeleccionada);
-    const eventoRef = ref(db, `eventos/${fechaKey}/${eventoId}`);
-
-    // Actualizar evento en Firebase con guía asignado
-    await update(eventoRef, { guiaAsignado: guiaId });
-
-    // Actualizar datos locales
-    eventos[fechaKey][eventoId].guiaAsignado = guiaId;
-
-    // Cambiar color del evento
-    const colorGuia = guias[guiaId]?.color || "#ccc";
-    contenedorEvento.style.backgroundColor = colorGuia;
-
-    // Remover el select después de asignar
-    select.remove();
-
-    // Actualizar lista de guías (conteos)
-    renderizarGuias();
-
-    alert(`Guía asignado: ${guias[guiaId].nombre}`);
-  });
-
-  return select;
-}
 
 function renderizarGantt(fechaInicio) {
   console.log("🟡 Entrando a renderizarGantt con fecha:", fechaInicio);
@@ -214,28 +166,7 @@ function renderizarGantt(fechaInicio) {
 
     // Agregar evento click para asignar guía
     block.addEventListener("click", () => {
-      // Mostrar prompt con nombres de guías
-      const nombresGuias = Object.values(guias).map(g => g.nombre).join(", ");
-      const guiaElegida = prompt(
-        `Guias disponibles:\n${nombresGuias}\n\nEscribe el nombre exacto del guía para asignar:`
-      );
-      if (!guiaElegida) return;
-
-      // Buscar ID del guía por nombre
-      const guiaSeleccionadaId = Object.entries(guias).find(([id, g]) => g.nombre.toLowerCase() === guiaElegida.toLowerCase())?.[0];
-      if (!guiaSeleccionadaId) {
-        alert("Guía no encontrado.");
-        return;
-      }
-
-      // Crear select para elegir guía debajo del evento
-      if (block.querySelector("select")) {
-        // Si ya existe el select, no hacer nada
-        return;
-      }
-      const selectGuias = crearSelectGuias(id, block);
-      block.appendChild(selectGuias);
-      selectGuias.value = guiaSeleccionadaId; // preseleccionar la guía que eligió en prompt
+      console.log(`Haz clic en el evento ${ev.titulo}`);
     });
 
     gantt.appendChild(block);
