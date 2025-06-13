@@ -61,8 +61,6 @@ function crearEncabezadoHorasYLíneas() {
 
 function syncScroll(source) {
   const scrollLeft = source.scrollLeft;
-  if (source !== horaEncabezado) horaEncabezado.scrollLeft = scrollLeft;
-  if (source !== lineasHoras) lineasHoras.scrollLeft = scrollLeft;
   if (source !== gantt) gantt.scrollLeft = scrollLeft;
 }
 
