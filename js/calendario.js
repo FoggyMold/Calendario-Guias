@@ -67,8 +67,6 @@ function syncScroll(source) {
 }
 
 gantt.addEventListener("scroll", () => syncScroll(gantt));
-horaEncabezado.addEventListener("scroll", () => syncScroll(horaEncabezado));
-lineasHoras.addEventListener("scroll", () => syncScroll(lineasHoras));
 
 
 function timeToPosition(timeStr) {
