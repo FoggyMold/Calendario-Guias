@@ -20,12 +20,20 @@
     </div>
 
     <div class="main-calendar">
-      <div class="hora-header" id="horaEncabezado"></div>
-      <div class="zona-de-tiempo">
-        <div class="lineas-horas" id="lineasHoras"></div>
-        <div class="grid-body" id="ganttCalendar"></div>
-      </div>
+  <!-- Cabecera de horas -->
+  <div class="hora-header scroll-synced" id="horaScroll">
+    <div class="contenido-scroll" id="horaEncabezado"></div>
+  </div>
+
+  <!-- Zona de scroll sincronizado -->
+  <div class="zona-de-tiempo scroll-synced" id="zonaScroll">
+    <div class="contenido-scroll">
+      <div class="lineas-horas" id="lineasHoras"></div>
+      <div id="ganttCalendar"></div>
     </div>
+  </div>
+</div>
+
   </div>
 
   <!-- Script principal del calendario (módulo ES6) -->
