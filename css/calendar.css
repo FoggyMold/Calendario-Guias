@@ -40,7 +40,6 @@ body {
   height: 40px;
   background-color: white;
   border-bottom: 1px solid #ccc;
-  overflow-x: hidden;
   white-space: nowrap;
 }
 
@@ -63,7 +62,6 @@ body {
 .lineas-verticales {
   position: relative;
   height: 100%;
-  overflow-x: hidden;
   background: #fafafa;
   border-bottom: 1px solid #ccc;
   white-space: nowrap;
@@ -82,7 +80,6 @@ body {
 #ganttCalendar {
   position: relative;
   height: 300px; /* O ajusta según necesites */
-  overflow-x: auto;
   white-space: nowrap;
   background: #fff;
   border-top: 1px solid #ccc;
@@ -121,16 +118,14 @@ body {
   font-size: 14px;
 }
 
-/* Scroll sincronizado para el gantt */
 .scroll-synced {
   overflow-x: auto;
   overflow-y: hidden;
   white-space: nowrap;
-  position: relative;
   width: 100%;
 }
 
 .contenido-scroll {
-  width: 2600px; /* 26 medias horas x 100px cada una */
+  width: 2600px; /* o lo que necesites */
   position: relative;
 }
