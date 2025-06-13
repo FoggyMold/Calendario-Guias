@@ -66,9 +66,10 @@ function syncScroll(source) {
   if (source !== gantt) gantt.scrollLeft = scrollLeft;
 }
 
-horaEncabezado.addEventListener("scroll", () => syncScroll(horaEncabezado));
-lineasHoras.addEventListener("scroll", () => syncScroll(lineasHoras));
-gantt.addEventListener("scroll", () => syncScroll(gantt));
+gantt.addEventListener("scroll", () => {
+  horaEncabezado.scrollLeft = gantt.scrollLeft;
+  lineasHoras.scrollLeft = gantt.scrollLeft;
+});
 
 function timeToPosition(timeStr) {
   const [h, m] = timeStr.split(":").map(Number);
