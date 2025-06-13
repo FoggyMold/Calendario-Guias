@@ -21,30 +21,61 @@ const listaGuias = document.getElementById("listaGuias");
 const gantt = document.getElementById("ganttCalendar");
 const horaEncabezado = document.getElementById("horaEncabezado");
 const lineasHoras = document.getElementById("lineasHoras");
-
 const fechaBase = document.getElementById("fechaBase");
 
-let escalaHora = 1; // pixeles por minuto
+const startHour = 7;
+const endHour = 20;
+const totalHalfHours = (endHour - startHour) * 2;
+const blockWidth = 60;
+const totalWidth = blockWidth * totalHalfHours;
+
 let guias = {};
 let eventos = {};
 let fechaSeleccionada = null;
 
-const horaInicial = 7;
-const horaFinal = 20;
+horaEncabezado.style.width = totalWidth + "px";
+lineasHoras.style.width = totalWidth + "px";
+gantt.style.width = totalWidth + "px";
 
-// -------- Utilidades --------
-function formatearFecha(date) {
-  return date.toISOString().split("T")[0];
+function crearEncabezadoHorasYLíneas() {
+  horaEncabezado.innerHTML = "";
+  lineasHoras.innerHTML = "";
+  for (let h = startHour; h <= endHour; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const horaTexto = h.toString().padStart(2, "0") + ":" + (m === 0 ? "00" : "30");
+      const horaDiv = document.createElement("div");
+      horaDiv.className = "hora";
+      horaDiv.style.width = blockWidth + "px";
+      horaDiv.innerText = horaTexto;
+      horaEncabezado.appendChild(horaDiv);
+
+      if (h !== endHour || m !== 30) {
+        const lineaDiv = document.createElement("div");
+        lineaDiv.className = "linea-hora";
+        lineaDiv.style.width = blockWidth + "px";
+        lineasHoras.appendChild(lineaDiv);
+      }
+    }
+  }
 }
 
-function calcularEscala() {
-  // Ancho total de gantt container (en px) para toda la franja horaria
-  const totalMinutos = (horaFinal - horaInicial) * 60;
-  const anchoDisponible = gantt.parentElement.clientWidth || 900; // fallback 900px si no disponible
-  escalaHora = anchoDisponible / totalMinutos;
+function syncScroll(source) {
+  const scrollLeft = source.scrollLeft;
+  if (source !== horaEncabezado) horaEncabezado.scrollLeft = scrollLeft;
+  if (source !== lineasHoras) lineasHoras.scrollLeft = scrollLeft;
+  if (source !== gantt) gantt.scrollLeft = scrollLeft;
 }
 
-// -------- Cargar datos --------
+horaEncabezado.addEventListener("scroll", () => syncScroll(horaEncabezado));
+lineasHoras.addEventListener("scroll", () => syncScroll(lineasHoras));
+gantt.addEventListener("scroll", () => syncScroll(gantt));
+
+function timeToPosition(timeStr) {
+  const [h, m] = timeStr.split(":").map(Number);
+  const halfHoursFromStart = (h - startHour) * 2 + (m === 30 ? 1 : 0);
+  return halfHoursFromStart * blockWidth;
+}
+
 async function cargarGuias() {
   const snap = await get(ref(db, "guias"));
   guias = snap.exists() ? snap.val() : {};
@@ -54,19 +85,18 @@ async function cargarEventosDesdeFirebase(fechaInicio) {
   eventos = {};
   const fechaStr = formatearFecha(fechaInicio);
   const snap = await get(ref(db, `eventos/${fechaStr}`));
-  if (snap.exists()) {
-    eventos[fechaStr] = snap.val();
-    console.log("Eventos cargados para", fechaStr, eventos[fechaStr]);
-  } else {
-    console.log("No hay eventos para", fechaStr);
-  }
+  eventos[fechaStr] = snap.exists() ? snap.val() : {};
 }
 
-// -------- Renderizado --------
+function formatearFecha(date) {
+  return date.toISOString().split("T")[0];
+}
 
 function renderizarGuias() {
   listaGuias.innerHTML = "";
+  if (!fechaSeleccionada) return;
   const fechaKey = formatearFecha(fechaSeleccionada);
+
   Object.entries(guias).forEach(([id, guia]) => {
     let eventosAsignados = 0;
     let totalPersonas = 0;
@@ -94,10 +124,10 @@ function renderizarGuias() {
 function renderizarGantt(fechaInicio) {
   gantt.innerHTML = "";
   const eventoAltura = 28;
+  const margenEntreEventos = 4;
   const fecha = formatearFecha(fechaInicio);
   const eventosDia = eventos[fecha] || {};
 
-  // Preparar array con datos numéricos y niveles para cascada
   const eventosArray = Object.entries(eventosDia)
     .filter(([id, ev]) => ev.inicio && ev.fin)
     .map(([id, ev]) => {
@@ -112,10 +142,8 @@ function renderizarGantt(fechaInicio) {
       };
     });
 
-  // Ordenar por inicio para asignar niveles
   eventosArray.sort((a, b) => a.inicioMin - b.inicioMin);
-
-  const niveles = []; // array para almacenar finMin de eventos en cada nivel
+  const niveles = [];
 
   eventosArray.forEach(evento => {
     let nivelAsignado = 0;
@@ -129,22 +157,12 @@ function renderizarGantt(fechaInicio) {
     }
   });
 
-  const totalMinutos = (horaFinal - horaInicial) * 60;
-  const anchoTotal = totalMinutos * escalaHora;
-
-  // Ajustar tamaño de contenedores para que encajen los eventos
-  gantt.style.width = `${anchoTotal}px`;
-  horaEncabezado.style.width = `${anchoTotal}px`;
-  lineasHoras.style.width = `${anchoTotal}px`;
-
   eventosArray.forEach(({ id, ev, inicioMin, finMin, nivel }) => {
-    // Filtrar eventos fuera del rango visible
-    if (finMin <= horaInicial * 60 || inicioMin >= horaFinal * 60) return;
+    if (finMin <= startHour * 60 || inicioMin >= endHour * 60) return;
 
-    const duracion = finMin - inicioMin;
-    const left = (inicioMin - horaInicial * 60) * escalaHora;
-    const width = duracion * escalaHora;
-    const top = nivel * (eventoAltura + 4);
+    const left = timeToPosition(ev.inicio);
+    const width = timeToPosition(ev.fin) - left;
+    const top = nivel * (eventoAltura + margenEntreEventos);
 
     const block = document.createElement("div");
     block.className = "event-block";
@@ -163,61 +181,49 @@ function renderizarGantt(fechaInicio) {
     block.style.cursor = "pointer";
     block.title = ev.titulo || ev.tituloOriginal || "Evento";
 
-    // Color según guía asignado o default
     if (ev.guiaAsignado && guias[ev.guiaAsignado]) {
       block.style.backgroundColor = guias[ev.guiaAsignado].color;
     } else {
-      block.style.backgroundColor = "#5a9bd5"; // color default
+      block.style.backgroundColor = "#5a9bd5";
     }
 
-    // Mostrar solo el título
     block.textContent = ev.tituloOriginal || ev.titulo || "Evento";
-
-    // Evento click para asignar guía (puedes implementar la lógica)
-    block.addEventListener("click", () => {
-      console.log(`Haz clic en el evento ${ev.titulo}`);
-      // Aquí podrías abrir un modal o desplegar opciones de asignación
-    });
-
     gantt.appendChild(block);
   });
 }
 
-// -------- Actualizar Vista Completa --------
-async function actualizarVista() {
+// === INTEGRACIÓN APP SCRIPT ===
+// Llama al Apps Script para sincronizar eventos desde Google Calendar
+async function sincronizarConAppScript(fecha) {
   try {
-    if (!fechaSeleccionada) return;
-
-    await cargarGuias();
-    await cargarEventosDesdeFirebase(fechaSeleccionada);
-
-    calcularEscala();
-
-    renderizarGuias();
-    renderizarGantt(fechaSeleccionada);
-
+    const response = await fetch(
+      `https://script.google.com/macros/s/AKfycbzm41rFeS8LMx6pNw0viVkmFjeDMQYV_1W7oS5O9QDnmdVWx-kTDYpM7aB8qKwnEjLZ/exec?fecha=${fecha}`
+    );
+    const data = await response.json();
+    console.log("Respuesta de Apps Script:", data);
   } catch (e) {
-    console.error("Error actualizando la vista:", e);
+    console.error("Error sincronizando con Apps Script:", e);
   }
 }
 
-// -------- Eventos UI -------- 
+// Cargar datos y actualizar todo
+async function actualizarVista() {
+  if (!fechaSeleccionada) return;
+
+  await sincronizarConAppScript(formatearFecha(fechaSeleccionada));
+  await cargarGuias();
+  await cargarEventosDesdeFirebase(fechaSeleccionada);
+
+  renderizarGuias();
+  renderizarGantt(fechaSeleccionada);
+}
+
+// Cambio de fecha
 fechaBase.addEventListener("change", async () => {
   if (!fechaBase.value) return;
   fechaSeleccionada = new Date(fechaBase.value);
-
-  // Llama al Google Apps Script para sincronizar eventos
-  const scriptUrl = "https://script.google.com/macros/s/AKfycbzHp67ra-6CUuH-gao0GlUz6rgAgr-LFauKmdn1gj0ykxEqPz6E0NjeTBz3Z4cBArLI/exec";
-  try {
-    const res = await fetch(`${scriptUrl}?fecha=${fechaBase.value}`);
-    const data = await res.json();
-    console.log("Eventos sincronizados desde GAS:", data);
-  } catch (error) {
-    console.error("Error al sincronizar con GAS:", error);
-  }
-
   await actualizarVista();
 });
 
-// Inicializar sin fecha seleccionada
-fechaSeleccionada = null;
+// Inicial
+crearEncabezadoHorasYLíneas();
