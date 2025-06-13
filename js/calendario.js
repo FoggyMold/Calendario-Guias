@@ -218,16 +218,7 @@ async function actualizarVista() {
   renderizarGantt(fechaSeleccionada);
 }
 
-// -------- Eventos UI --------
-  zoomIn.addEventListener("click", () => {
-  escalaHora = Math.min(escalaHora + 10, escalaMax);
-  actualizarVista();
-  });
-
-  zoomOut.addEventListener("click", () => {
-  escalaHora = Math.max(escalaHora - 10, escalaMin);
-  actualizarVista();
-  });
+// -------- Eventos UI -------- 
 
 contenedorScroll.addEventListener("scroll", (e) => {
   const scrollX = e.target.scrollLeft;
