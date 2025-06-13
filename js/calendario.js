@@ -192,17 +192,15 @@ function renderizarGantt(fechaInicio) {
   });
 }
 
-// === INTEGRACIÓN APP SCRIPT ===
-// Llama al Apps Script para sincronizar eventos desde Google Calendar
-async function sincronizarConAppScript(fecha) {
+// Sincronizar con Apps Script y luego actualizar vista
+async function sincronizarConAppScript(fechaISO) {
+  const scriptUrl = "https://script.google.com/macros/s/AKfycbzHp67ra-6CUuH-gao0GlUz6rgAgr-LFauKmdn1gj0ykxEqPz6E0NjeTBz3Z4cBArLI/exec";
   try {
-    const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzm41rFeS8LMx6pNw0viVkmFjeDMQYV_1W7oS5O9QDnmdVWx-kTDYpM7aB8qKwnEjLZ/exec?fecha=${fecha}`
-    );
-    const data = await response.json();
-    console.log("Respuesta de Apps Script:", data);
-  } catch (e) {
-    console.error("Error sincronizando con Apps Script:", e);
+    const res = await fetch(`${scriptUrl}?fecha=${fechaISO}`);
+    const data = await res.json();
+    console.log("Eventos sincronizados desde GAS:", data);
+  } catch (error) {
+    console.error("Error al sincronizar con GAS:", error);
   }
 }
 
@@ -210,7 +208,8 @@ async function sincronizarConAppScript(fecha) {
 async function actualizarVista() {
   if (!fechaSeleccionada) return;
 
-  await sincronizarConAppScript(formatearFecha(fechaSeleccionada));
+  const fechaISO = formatearFecha(fechaSeleccionada);
+  await sincronizarConAppScript(fechaISO);
   await cargarGuias();
   await cargarEventosDesdeFirebase(fechaSeleccionada);
 
