@@ -31,45 +31,76 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
 }
 
+/* Contenedor del encabezado de horas */
 .hora-header {
-  display: grid;
-  grid-template-columns: repeat(28, 1fr);
+  position: relative;
   height: 40px;
   background-color: white;
   border-bottom: 1px solid #ccc;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
+/* Cada hora se posiciona inline-block para poder escalar con JS */
 .hora {
+  display: inline-block;
+  width: calc((100% / 13)); /* Esto es una base, se ajusta con JS */
   font-size: 10px;
   text-align: center;
-  padding-top: 10px;
+  line-height: 40px;
   border-left: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
 .hora:first-child {
   border-left: none;
 }
 
-.zona-de-tiempo {
-  flex: 1;
-  display: flex;
-}
-
-.lineas-horas {
-  display: grid;
-  grid-template-columns: repeat(28, 1fr);
-  width: 100%;
+/* Contenedor que tiene las líneas verticales (las horas) */
+.lineas-verticales {
+  position: relative;
   height: 100%;
+  overflow-x: auto;
+  background: #fafafa;
+  border-bottom: 1px solid #ccc;
+  white-space: nowrap;
 }
 
-.linea-hora {
+/* Las líneas verticales: cada media hora una línea fina */
+.linea-vertical {
+  display: inline-block;
+  height: 100%;
   border-left: 1px solid #e0e0e0;
+  box-sizing: border-box;
+  width: calc((100% / 26)); /* Para media hora de 13 horas, se ajusta con JS */
 }
 
-.linea-hora:first-child {
-  border-left: none;
+/* Contenedor de eventos dentro del gantt */
+#ganttCalendar {
+  position: relative;
+  height: 300px; /* O ajusta según necesites */
+  overflow-x: auto;
+  white-space: nowrap;
+  background: #fff;
+  border-top: 1px solid #ccc;
+}
+
+/* Cada evento que se posiciona en absolute */
+.event-block {
+  position: absolute;
+  height: 28px;
+  border-radius: 4px;
+  color: white;
+  padding: 2px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Estilos visuales para las guías */
@@ -88,4 +119,13 @@ body {
 
 .guia-info {
   font-size: 14px;
+}
+
+/* Scroll sincronizado para el gantt */
+.scroll-synced {
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  position: relative;
+  width: 100%;
 }
