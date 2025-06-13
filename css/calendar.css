@@ -132,4 +132,5 @@ body {
 
 .contenido-scroll {
   width: 2600px; /* 26 medias horas x 100px cada una */
+  position: relative;
 }
