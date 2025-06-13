@@ -180,13 +180,35 @@ function renderizarGantt(fechaInicio) {
 }
 
 // -------- Actualizar Vista Completa --------
-async function actualizarVista() {
-  if (!fechaSeleccionada) return;
-  calcularEscalaInicial();
-  await cargarGuias();
-  await cargarEventosDesdeFirebase(fechaSeleccionada);
-  renderizarGuias();
-  renderizarGantt(fechaSeleccionada);
+async function actualizarVista(fecha) {
+  try {
+    // Obtener eventos de Firebase o Google Apps Script
+    const eventos = await obtenerEventosParaFecha(fecha); // tu lógica
+
+    // Limpiar solo eventos del Gantt
+    const gantt = document.getElementById('ganttCalendar');
+    gantt.innerHTML = ''; // NO TOQUES horaEncabezado ni lineasHoras
+
+    eventos.forEach(evento => {
+      const elementoEvento = crearElementoEvento(evento); // tu función
+      gantt.appendChild(elementoEvento);
+    });
+
+    // Actualizar lista de guías
+    const lista = document.getElementById('listaGuias');
+    lista.innerHTML = ''; // Limpiar solo guías
+
+    const guias = await obtenerGuias(); // tu lógica
+    guias.forEach(g => {
+      const item = document.createElement('div');
+      item.className = 'guia-item';
+      item.textContent = g.nombre;
+      lista.appendChild(item);
+    });
+
+  } catch (e) {
+    console.error("Error actualizando la vista:", e);
+  }
 }
 
 // -------- Eventos UI -------- 
