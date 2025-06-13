@@ -40,14 +40,14 @@ body {
   height: 40px;
   background-color: white;
   border-bottom: 1px solid #ccc;
-  overflow-x: hidden;
+  overflow-x: auto;
   white-space: nowrap;
 }
 
 /* Cada hora se posiciona inline-block para poder escalar con JS */
 .hora {
   display: inline-block;
-  width: calc((100% / 13)); /* Esto es una base, se ajusta con JS */
+  width: 100px; /* Esto es una base, se ajusta con JS */
   font-size: 10px;
   text-align: center;
   line-height: 40px;
@@ -63,7 +63,7 @@ body {
 .lineas-verticales {
   position: relative;
   height: 100%;
-  overflow-x: hidden;
+  overflow-x: auto;
   background: #fafafa;
   border-bottom: 1px solid #ccc;
   white-space: nowrap;
@@ -75,7 +75,7 @@ body {
   height: 100%;
   border-left: 1px solid #e0e0e0;
   box-sizing: border-box;
-  width: calc((100% / 26)); /* Para media hora de 13 horas, se ajusta con JS */
+  width: 50px; /* Para media hora de 13 horas, se ajusta con JS */
 }
 
 /* Contenedor de eventos dentro del gantt */
@@ -128,4 +128,8 @@ body {
   white-space: nowrap;
   position: relative;
   width: 100%;
+}
+
+.contenido-scroll {
+  width: 2600px; /* 26 medias horas x 100px cada una */
 }
