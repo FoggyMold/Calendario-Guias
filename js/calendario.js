@@ -179,34 +179,6 @@ function renderizarGantt(fechaInicio) {
   lineasVerticales.style.width = `${anchoTotal}px`;
 }
 
-function renderizarEncabezadoHorasYLineas() {
-  horaEncabezado.innerHTML = "";
-  lineasVerticales.innerHTML = "";
-
-  const intervalosPorHora = 2; // cada 30 minutos
-  const totalColumnas = (horaFinal - horaInicial) * intervalosPorHora;
-  const slotWidth = escalaHora / 2;
-  document.documentElement.style.setProperty("--slot-width", `${slotWidth}px`);
-
-  for (let i = 0; i <= totalColumnas; i++) {
-    const minutos = i * 30;
-    const hora = Math.floor(minutos / 60) + horaInicial;
-    const min = minutos % 60;
-    const horaTexto = `${hora.toString().padStart(2, "0")}:${min === 0 ? "00" : "30"}`;
-
-    const divHora = document.createElement("div");
-    divHora.textContent = horaTexto;
-    divHora.style.width = `${slotWidth}px`;
-    horaEncabezado.appendChild(divHora);
-
-    const linea = document.createElement("div");
-    linea.className = "line";
-    linea.style.width = `${slotWidth}px`;
-    lineasVerticales.appendChild(linea);
-    
-  }
-}
-
 // -------- Actualizar Vista Completa --------
 async function actualizarVista() {
   if (!fechaSeleccionada) return;
@@ -214,7 +186,6 @@ async function actualizarVista() {
   await cargarGuias();
   await cargarEventosDesdeFirebase(fechaSeleccionada);
   renderizarGuias();
-  renderizarEncabezadoHorasYLineas();
   renderizarGantt(fechaSeleccionada);
 }
 
