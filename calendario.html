@@ -16,6 +16,7 @@
 
   <div class="calendar-container">
     <div class="sidebar" id="listaGuias">
+      <!-- Lista dinámica de guías -->
     </div>
 
     <div class="main-calendar">
@@ -27,31 +28,11 @@
     </div>
   </div>
 
-  <script>
-    const horaHeader = document.getElementById('horaEncabezado');
-    const lineasHoras = document.getElementById('lineasHoras');
-
-    for (let h = 7; h <= 20; h++) {
-      for (let m = 0; m < 60; m += 30) {
-        const horaTexto = h.toString().padStart(2, '0') + ':' + (m === 0 ? '00' : '30');
-
-        const hora = document.createElement('div');
-        hora.className = 'hora';
-        hora.innerText = horaTexto;
-        horaHeader.appendChild(hora);
-
-        const linea = document.createElement('div');
-        linea.className = 'linea-hora';
-        lineasHoras.appendChild(linea);
-      }
-    }
-  </script>
-
+  <!-- Script principal del calendario (módulo ES6) -->
   <script type="module" src="js/calendario.js"></script>
 
-    <!-- Bootstrap y dependencias -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="js/bootstrap.min.js"></script>
+  <!-- Bootstrap y dependencias -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 </body>
 </html>
